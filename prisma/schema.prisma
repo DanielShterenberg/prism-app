@@ -1,0 +1,25 @@
+// Prisma schema for Prism — ASD assessment app
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Single table for all assessments.
+/// The `data` field holds the full Assessment JSON (JSONB in Postgres),
+/// matching the TypeScript Assessment type in /types/assessment.ts.
+model Assessment {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id")
+  data      Json     @db.JsonB
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  status    String   @default("in_progress")
+
+  @@map("assessments")
+}

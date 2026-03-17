@@ -15,8 +15,8 @@ build/
 .env.test.local
 .env.production.local
 
-# Prisma
-prisma/migrations/
+# Prisma — generated client only; migrations are intentionally committed
+lib/generated/
 
 # Testing
 coverage/
@@ -45,3 +45,4 @@ next-env.d.ts
 
 # Agent worktrees (ephemeral Claude Code agent state)
 .claude/worktrees/
+
