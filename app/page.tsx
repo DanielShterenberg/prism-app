@@ -9,23 +9,26 @@
  * - Empty state with a prompt to create the first assessment.
  * - FAB (Floating Action Button) at the bottom-left (RTL: left = visual right)
  *   to create a new assessment.
+ * - NewAssessmentModal opens when FAB is pressed.
  */
 
-import React from "react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAssessments } from "@/hooks/useAssessments";
 import AssessmentCard from "@/components/AssessmentCard";
+import NewAssessmentModal from "@/components/NewAssessmentModal";
 
 export default function HomePage() {
   const { assessments, loading, syncing } = useAssessments();
+  const router = useRouter();
+  const [modalOpen, setModalOpen] = useState(false);
 
   function handleNewAssessment() {
-    // Placeholder: will navigate to /assessments/new once that screen exists.
-    alert("יצירת הערכה חדשה — בקרוב");
+    setModalOpen(true);
   }
 
   function handleCardClick(id: string) {
-    // Placeholder: will navigate to /assessments/[id] once that screen exists.
-    alert(`פתיחת הערכה ${id}`);
+    router.push(`/assessment/${id}`);
   }
 
   return (
@@ -115,6 +118,13 @@ export default function HomePage() {
       >
         +
       </button>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* New Assessment Modal                                                 */}
+      {/* ------------------------------------------------------------------ */}
+      {modalOpen && (
+        <NewAssessmentModal onClose={() => setModalOpen(false)} />
+      )}
     </main>
   );
 }
