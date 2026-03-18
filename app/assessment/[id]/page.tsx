@@ -6,20 +6,23 @@
  * This is the outer shell of the anamnesis form. It provides:
  *  - Header: patient name + assessment date
  *  - BlockTabBar: 5 tabs (A–E) with active indicator and completed checkmarks
- *  - A content area where the active block form will be rendered (later issues)
+ *  - A content area where the active block form is rendered
  *  - A "סיום" (Finish) button that navigates to /assessment/[id]/summary
  *
  * Data:
  *  - Loaded from localStorage immediately on mount (offline-first).
  *  - If the assessment is not found (bad id / cleared storage), shows an error.
+ *  - Auto-saves on every change via updateAssessment() + useSync.
  *
  * Layout: RTL inherited from root <html dir="rtl">.
  */
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAssessment } from "@/hooks/useAssessment";
+import { useSync } from "@/hooks/useSync";
 import BlockTabBar, { BLOCKS } from "@/components/BlockTabBar";
+import BlockA from "@/components/BlockA";
 import type { Assessment } from "@/types/assessment";
 import type { BlockId } from "@/components/BlockTabBar";
 
@@ -64,8 +67,30 @@ export default function AssessmentPage() {
   const router = useRouter();
   const id = typeof params?.id === "string" ? params.id : "";
 
-  const { assessment, notFound } = useAssessment(id);
+  const { assessment, notFound, refresh } = useAssessment(id);
   const [activeBlock, setActiveBlock] = useState<BlockId>("A");
+
+  // Snapshot passed to useSync — updated whenever a block saves.
+  const [syncSnapshot, setSyncSnapshot] = useState<Assessment | null>(null);
+
+  // Sync hook — debounced cloud sync, offline-first.
+  useSync({
+    assessment: syncSnapshot,
+    onSyncStatusChange: () => {
+      // Refresh local state after sync outcome so syncStatus indicator stays accurate.
+      refresh();
+    },
+  });
+
+  // Called by block components after each field change.
+  const handleBlockUpdate = useCallback(
+    (updated: Assessment) => {
+      setSyncSnapshot(updated);
+      // Also refresh the assessment state so the header reflects any changes.
+      refresh();
+    },
+    [refresh]
+  );
 
   function handleFinish() {
     router.push(`/assessment/${id}/summary`);
@@ -172,16 +197,18 @@ export default function AssessmentPage() {
         className="flex-1 max-w-2xl w-full mx-auto px-4 py-6 pb-32"
         aria-label={`בלוק ${activeBlock}`}
       >
-        {/*
-          Block form content will be rendered here in subsequent issues
-          (BlockA, BlockB, … BlockE components).
-          For now we show a placeholder so the shell is navigable.
-        */}
-        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6 text-center text-gray-400">
-          <p className="text-[17px]">
-            בלוק {activeBlock} —{" "}
-            {BLOCKS.find((b) => b.id === activeBlock)?.label}
-          </p>
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
+          {activeBlock === "A" && (
+            <BlockA assessment={assessment} onUpdate={handleBlockUpdate} />
+          )}
+          {activeBlock !== "A" && (
+            <div className="text-center text-gray-400">
+              <p className="text-[17px]">
+                בלוק {activeBlock} —{" "}
+                {BLOCKS.find((b) => b.id === activeBlock)?.label}
+              </p>
+            </div>
+          )}
         </div>
       </main>
 
