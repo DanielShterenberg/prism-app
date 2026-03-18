@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { useAssessments } from "@/hooks/useAssessments";
 import AssessmentCard from "@/components/AssessmentCard";
 import NewAssessmentModal from "@/components/NewAssessmentModal";
+import OnboardingModal from "@/components/OnboardingModal";
 
 export default function HomePage() {
   const { assessments, loading, syncing } = useAssessments();
@@ -125,6 +126,11 @@ export default function HomePage() {
       {modalOpen && (
         <NewAssessmentModal onClose={() => setModalOpen(false)} />
       )}
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Onboarding Modal — shown once on first visit                        */}
+      {/* ------------------------------------------------------------------ */}
+      <OnboardingModal />
     </main>
   );
 }
