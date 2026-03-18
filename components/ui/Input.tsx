@@ -4,9 +4,16 @@
  * Font size is always ≥ 16 px (1rem) to prevent iPad Safari auto-zoom.
  * Supports optional label, helper text, and error state.
  * RTL-aware — inherits dir="rtl" from root <html>.
+ *
+ * iPad Safari keyboard avoidance:
+ * On focus, scrolls the field into view so the on-screen keyboard does not
+ * obscure the active field. Uses scrollIntoView with block:"nearest" to avoid
+ * unnecessary scrolling when the field is already visible.
  */
 
-import React, { forwardRef } from "react";
+"use client";
+
+import React, { forwardRef, useCallback } from "react";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -39,6 +46,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     id,
     wrapperClassName = "",
     className = "",
+    onFocus,
     ...rest
   },
   ref
@@ -46,6 +54,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const inputId = id ?? `input-${Math.random().toString(36).slice(2, 9)}`;
   const errorId = error ? `${inputId}-error` : undefined;
   const helperId = helperText && !error ? `${inputId}-helper` : undefined;
+
+  /**
+   * Keyboard avoidance for iPad Safari:
+   * When the on-screen keyboard appears, the visual viewport shrinks. Calling
+   * scrollIntoView({ block: "nearest" }) ensures the focused field is scrolled
+   * into the visible area above the keyboard so the user can see what they type.
+   */
+  const handleFocus = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      e.target.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      onFocus?.(e);
+    },
+    [onFocus]
+  );
 
   return (
     <div className={["flex flex-col gap-1", wrapperClassName].join(" ")}>
@@ -71,6 +93,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         aria-required={required}
         aria-invalid={!!error}
         aria-describedby={errorId ?? helperId}
+        onFocus={handleFocus}
         className={[
           "w-full rounded-xl border px-4 py-3",
           // Font ≥ 16 px prevents iPad Safari auto-zoom

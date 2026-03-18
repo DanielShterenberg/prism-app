@@ -4,6 +4,11 @@
  * Height grows with content — never shows a scroll bar (PRD constraint).
  * Font size ≥ 16 px to prevent iPad Safari auto-zoom.
  * RTL-aware, supports label / error / helperText same as Input.
+ *
+ * iPad Safari keyboard avoidance:
+ * On focus, scrolls the field into view so the on-screen keyboard does not
+ * obscure the active field. Paired with auto-resize so the full textarea
+ * height is considered when scrolling.
  */
 
 "use client";
@@ -76,6 +81,9 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const handleFocus = useCallback(
       (e: React.FocusEvent<HTMLTextAreaElement>) => {
         autoResize(e.target);
+        // Keyboard avoidance for iPad Safari: scroll the field into view above
+        // the on-screen keyboard so the user can see what they are typing.
+        e.target.scrollIntoView({ block: "nearest", behavior: "smooth" });
         onFocus?.(e);
       },
       [onFocus]

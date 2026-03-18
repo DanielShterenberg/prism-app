@@ -154,4 +154,57 @@ describe("BlockTabBar", () => {
 
     expect(screen.getByRole("navigation", { name: "בלוקי הערכה" })).toBeInTheDocument();
   });
+
+  // ---------------------------------------------------------------------------
+  // Landscape mode — scrollbar-none for clean scrolling
+  // ---------------------------------------------------------------------------
+
+  it("applies scrollbar-none class to the nav for landscape mode", () => {
+    render(
+      <BlockTabBar
+        activeBlock="A"
+        completedBlocks={new Set()}
+        onSelectBlock={jest.fn()}
+      />
+    );
+
+    const nav = screen.getByRole("navigation", { name: "בלוקי הערכה" });
+    expect(nav.className).toContain("scrollbar-none");
+  });
+
+  it("applies overflow-x-auto to the nav for horizontal scrollability", () => {
+    render(
+      <BlockTabBar
+        activeBlock="A"
+        completedBlocks={new Set()}
+        onSelectBlock={jest.fn()}
+      />
+    );
+
+    const nav = screen.getByRole("navigation", { name: "בלוקי הערכה" });
+    expect(nav.className).toContain("overflow-x-auto");
+  });
+
+  // ---------------------------------------------------------------------------
+  // Active tab scroll-into-view (landscape keyboard avoidance)
+  // ---------------------------------------------------------------------------
+
+  it("calls scrollIntoView on the active tab button on mount", () => {
+    // The global jest.setup.ts mocks scrollIntoView on HTMLElement.prototype.
+    // Spy on it to verify it's called when the component mounts with an active block.
+    const scrollIntoView = jest.spyOn(HTMLElement.prototype, "scrollIntoView");
+
+    render(
+      <BlockTabBar
+        activeBlock="B"
+        completedBlocks={new Set()}
+        onSelectBlock={jest.fn()}
+      />
+    );
+
+    // scrollIntoView should have been called at least once for the active tab
+    expect(scrollIntoView).toHaveBeenCalled();
+
+    scrollIntoView.mockRestore();
+  });
 });

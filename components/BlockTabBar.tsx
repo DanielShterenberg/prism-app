@@ -8,9 +8,14 @@
  *
  * Layout: RTL inherited from root <html dir="rtl">.
  * Touch targets ≥ 44px.
+ *
+ * Landscape mode (iPad):
+ * The nav has overflow-x-auto + scrollbar-none so all 5 tabs remain
+ * accessible in narrow landscape viewports without a visible scrollbar.
+ * The active tab is scrolled into view automatically when it changes.
  */
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -53,10 +58,26 @@ export function BlockTabBar({
   completedBlocks,
   onSelectBlock,
 }: BlockTabBarProps) {
+  // Ref map so we can scroll the active tab button into view when it changes.
+  // This ensures the active tab is visible in landscape mode where the tab
+  // strip may be wider than the viewport.
+  const tabRefs = useRef<Partial<Record<BlockId, HTMLButtonElement>>>({});
+
+  useEffect(() => {
+    const activeEl = tabRefs.current[activeBlock];
+    if (activeEl) {
+      activeEl.scrollIntoView({
+        block: "nearest",
+        inline: "nearest",
+        behavior: "smooth",
+      });
+    }
+  }, [activeBlock]);
+
   return (
     <nav
       aria-label="בלוקי הערכה"
-      className="w-full overflow-x-auto border-b border-gray-200 bg-white"
+      className="w-full overflow-x-auto scrollbar-none border-b border-gray-200 bg-white"
     >
       <ul
         role="tablist"
@@ -74,6 +95,9 @@ export function BlockTabBar({
                 aria-selected={isActive}
                 aria-label={`בלוק ${block.id} — ${block.label}${isCompleted ? " (הושלם)" : ""}`}
                 onClick={() => onSelectBlock(block.id)}
+                ref={(el) => {
+                  if (el) tabRefs.current[block.id] = el;
+                }}
                 className={[
                   // Layout — min 44 px touch target height
                   "relative flex flex-col items-center justify-center gap-0.5",
