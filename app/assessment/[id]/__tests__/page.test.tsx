@@ -30,6 +30,18 @@ jest.mock("next/navigation", () => ({
 
 jest.mock("@/hooks/useAssessment");
 
+// AssessmentSidebar (rendered on desktop) uses useAssessments — stub it out
+// to prevent it from calling listAssessments / fetch in the test environment.
+jest.mock("@/hooks/useAssessments", () => ({
+  useAssessments: () => ({
+    assessments: [],
+    loading: false,
+    cloudError: null,
+    syncing: false,
+    refresh: jest.fn(),
+  }),
+}));
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -97,61 +109,65 @@ describe("AssessmentPage", () => {
   it("renders patient name in the header", () => {
     mockFound(makeAssessment());
     render(<AssessmentPage />);
-    expect(screen.getByText("אחמד כהן")).toBeInTheDocument();
+    // Patient name appears in both mobile and desktop headers
+    const headings = screen.getAllByText("אחמד כהן");
+    expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders assessment date in the header", () => {
     mockFound(makeAssessment());
     render(<AssessmentPage />);
-    expect(screen.getByText("18/03/2026")).toBeInTheDocument();
+    // Date appears in both mobile and desktop headers
+    const dates = screen.getAllByText("18/03/2026");
+    expect(dates.length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders all 5 block tabs", () => {
     mockFound(makeAssessment());
     render(<AssessmentPage />);
-
-    expect(screen.getByRole("tab", { name: /בלוק A/ })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /בלוק B/ })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /בלוק C/ })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /בלוק D/ })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /בלוק E/ })).toBeInTheDocument();
+    // Two BlockTabBar instances (mobile + desktop) — use getAllByRole
+    expect(screen.getAllByRole("tab", { name: /בלוק A/ }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole("tab", { name: /בלוק B/ }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole("tab", { name: /בלוק C/ }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole("tab", { name: /בלוק D/ }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole("tab", { name: /בלוק E/ }).length).toBeGreaterThanOrEqual(1);
   });
 
   it("sets block A as active by default", () => {
     mockFound(makeAssessment());
     render(<AssessmentPage />);
-    expect(screen.getByRole("tab", { name: /בלוק A/ })).toHaveAttribute(
-      "aria-selected",
-      "true"
-    );
+    // At least one tab A is active
+    const tabsA = screen.getAllByRole("tab", { name: /בלוק A/ });
+    expect(tabsA.some((t) => t.getAttribute("aria-selected") === "true")).toBe(true);
   });
 
   it("switches active block when a tab is clicked", () => {
     mockFound(makeAssessment());
     render(<AssessmentPage />);
 
-    fireEvent.click(screen.getByRole("tab", { name: /בלוק C/ }));
+    // Click the first tab C (mobile)
+    const tabsC = screen.getAllByRole("tab", { name: /בלוק C/ });
+    fireEvent.click(tabsC[0]);
 
-    expect(screen.getByRole("tab", { name: /בלוק C/ })).toHaveAttribute(
-      "aria-selected",
-      "true"
-    );
-    expect(screen.getByRole("tab", { name: /בלוק A/ })).toHaveAttribute(
-      "aria-selected",
-      "false"
-    );
+    const updatedTabsC = screen.getAllByRole("tab", { name: /בלוק C/ });
+    expect(updatedTabsC.some((t) => t.getAttribute("aria-selected") === "true")).toBe(true);
+
+    const updatedTabsA = screen.getAllByRole("tab", { name: /בלוק A/ });
+    expect(updatedTabsA.every((t) => t.getAttribute("aria-selected") === "false")).toBe(true);
   });
 
   it("renders the סיום finish button", () => {
     mockFound(makeAssessment());
     render(<AssessmentPage />);
-    expect(screen.getByRole("button", { name: "סיום" })).toBeInTheDocument();
+    const finishBtns = screen.getAllByRole("button", { name: "סיום" });
+    expect(finishBtns.length).toBeGreaterThanOrEqual(1);
   });
 
   it("navigates to /assessment/[id]/summary when סיום is clicked", () => {
     mockFound(makeAssessment());
     render(<AssessmentPage />);
-    fireEvent.click(screen.getByRole("button", { name: "סיום" }));
+    const finishBtns = screen.getAllByRole("button", { name: "סיום" });
+    fireEvent.click(finishBtns[0]);
     expect(mockPush).toHaveBeenCalledWith("/assessment/test-id-123/summary");
   });
 
@@ -160,9 +176,8 @@ describe("AssessmentPage", () => {
     mockFound(makeAssessment({ familyBackground: { father: "אבי" } }));
     render(<AssessmentPage />);
 
-    expect(
-      screen.getByRole("tab", { name: /בלוק B.*הושלם/ })
-    ).toBeInTheDocument();
+    const completedTabs = screen.getAllByRole("tab", { name: /בלוק B.*הושלם/ });
+    expect(completedTabs.length).toBeGreaterThanOrEqual(1);
   });
 
   it("does not show completed checkmark for blocks without data", () => {
@@ -171,25 +186,25 @@ describe("AssessmentPage", () => {
 
     // B, C, D, E all have empty data — none should have הושלם
     for (const blockId of ["B", "C", "D", "E"]) {
-      const label = screen
-        .getByRole("tab", { name: new RegExp(`בלוק ${blockId}`) })
-        .getAttribute("aria-label");
-      expect(label).not.toContain("הושלם");
+      const tabs = screen.getAllByRole("tab", { name: new RegExp(`בלוק ${blockId}`) });
+      tabs.forEach((tab) => {
+        expect(tab.getAttribute("aria-label")).not.toContain("הושלם");
+      });
     }
   });
 
   it("renders back-to-list button in the header", () => {
     mockFound(makeAssessment());
     render(<AssessmentPage />);
-    expect(
-      screen.getByRole("button", { name: "חזרה לרשימה" })
-    ).toBeInTheDocument();
+    const btns = screen.getAllByRole("button", { name: "חזרה לרשימה" });
+    expect(btns.length).toBeGreaterThanOrEqual(1);
   });
 
   it("navigates to '/' when the header back button is clicked", () => {
     mockFound(makeAssessment());
     render(<AssessmentPage />);
-    fireEvent.click(screen.getByRole("button", { name: "חזרה לרשימה" }));
+    const btns = screen.getAllByRole("button", { name: "חזרה לרשימה" });
+    fireEvent.click(btns[0]);
     expect(mockPush).toHaveBeenCalledWith("/");
   });
 });
