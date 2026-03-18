@@ -23,6 +23,10 @@ import { useAssessment } from "@/hooks/useAssessment";
 import { useSync } from "@/hooks/useSync";
 import BlockTabBar, { BLOCKS } from "@/components/BlockTabBar";
 import BlockA from "@/components/BlockA";
+import BlockB from "@/components/BlockB";
+import BlockC from "@/components/BlockC";
+import BlockD from "@/components/BlockD";
+import BlockE from "@/components/BlockE";
 import type { Assessment } from "@/types/assessment";
 import type { BlockId } from "@/components/BlockTabBar";
 
@@ -201,13 +205,17 @@ export default function AssessmentPage() {
           {activeBlock === "A" && (
             <BlockA assessment={assessment} onUpdate={handleBlockUpdate} />
           )}
-          {activeBlock !== "A" && (
-            <div className="text-center text-gray-400">
-              <p className="text-[17px]">
-                בלוק {activeBlock} —{" "}
-                {BLOCKS.find((b) => b.id === activeBlock)?.label}
-              </p>
-            </div>
+          {activeBlock === "B" && (
+            <BlockB assessment={assessment} onUpdate={handleBlockUpdate} />
+          )}
+          {activeBlock === "C" && (
+            <BlockC assessment={assessment} onUpdate={handleBlockUpdate} />
+          )}
+          {activeBlock === "D" && (
+            <BlockD assessment={assessment} onUpdate={handleBlockUpdate} />
+          )}
+          {activeBlock === "E" && (
+            <BlockE assessment={assessment} onUpdate={handleBlockUpdate} />
           )}
         </div>
       </main>
