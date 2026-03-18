@@ -16,7 +16,7 @@
 - Jest config: `testEnvironment: "jsdom"`, `preset: "ts-jest"`, path alias `@/` maps to project root
 - API route tests need `@jest-environment node` docblock (jsdom breaks next/server)
 - jsdom does NOT define `Response` constructor — use plain `{ ok: boolean }` objects in fetch mocks
-- Issues completed: #2, #1, #3, #4, #5, #6, #7, #8 (new assessment modal), #9 (anamnesis shell), #10 (Block A), #15 (summary screen), #17 (iPad Safari optimization), #21 (privacy onboarding)
+- Issues completed: #2, #1, #3, #4, #5, #6, #7, #8 (new assessment modal), #9 (anamnesis shell), #10 (Block A), #15 (summary screen), #17 (iPad Safari optimization), #21 (privacy onboarding), #18 (desktop layout)
 - Summary screen pattern: `buildBlockSummaries()` extracts non-empty fields per block using `nonEmpty()` helper; blocks with 0 fields are filtered out; assessment tools array joined as comma-separated string
 - When patient name appears both in h1 header and as a block field value, use `getAllByText` or `getByRole('heading', {level:1})` in tests — `getByText` will throw on multiple matches
 - Always mock `@/hooks/useSync` in page-level tests (it triggers network calls)
@@ -38,3 +38,7 @@
 - iPad Safari patterns: viewport Viewport export in layout.tsx (maximumScale:1, viewportFit:"cover"); safe-bottom/safe-top/safe-inline CSS classes use env(safe-area-inset-*); scrollIntoView({block:"nearest"}) on input focus for keyboard avoidance; scrollbar-none hides scrollbar while allowing scroll; jest.setup.ts guards scrollIntoView mock with typeof window check (API route tests use node env)
 - Pre-existing lint errors: Input.tsx, Textarea.tsx, Modal.tsx all have Math.random in render — these are NOT new, do not waste time fixing them unless explicitly asked
 - Branch management gotcha: git stash pop can end up on the wrong branch after checkout; always verify current branch with `git branch` after switching; use a fresh branch from origin/master to avoid mixing commits from different issues
+- Desktop layout pattern (#18): use `lg:hidden` / `hidden lg:block` to render both mobile and desktop variants of the same header/action bar; desktop sidebar uses `lg:order-last` in flex to appear on the right in RTL; `max-w-[900px]` container with `lg:flex lg:gap-0 lg:items-start` creates the two-column layout
+- Dual-render test gotcha (#18): when both mobile and desktop variants render simultaneously in jsdom, `getByText`/`getByRole` will throw on multiple matches — always use `getAllBy` variants and check `.length >= 1`, or use index `[0]` when clicking
+- When adding sidebar that uses `useAssessments` to a page, must mock `@/hooks/useAssessments` in that page's tests to prevent `listAssessments is not a function` errors
+- Inner component functions defined inside a render function trigger `react-hooks/static-components` lint error — use JSX variable (`const jsx = (<div>...</div>)`) instead of inner component functions for shared JSX in a single component

@@ -57,3 +57,27 @@ The `Assessment` type in `/types/assessment.ts` is the single source of truth. A
 ## Issue Tracker
 
 GitHub Issues are the source of truth for work. Run `zsh scripts/create-issues.sh` to populate them (once only). Recommended start order: #2 → #1 → #3 → #4 → #5 → #6 → #7 → #10.
+
+## Babysitter
+
+This project uses [babysitter](https://github.com/a5c-ai/babysitter) to orchestrate automated workflows.
+
+**Issue resolution loop** — picks up open GitHub issues, runs the `issue-resolver` agent to implement each one, creates a PR, waits for approval, squash-merges, pulls master, and moves to the next issue.
+
+To start the issue loop:
+```bash
+/babysitter:call
+```
+
+**Workflow (per issue):**
+1. `git checkout master && git pull`
+2. `git checkout -b feature/issue-{N}-{slug}`
+3. Issue-resolver agent implements the feature with tests
+4. `gh pr create` + breakpoint for your review
+5. `gh pr merge --squash` after approval
+6. `git checkout master && git pull`
+7. Loop to next open issue
+
+**Babysitter config:** Semi-autonomous. Always pauses before PR merge for your review.
+
+Run and state files live in `.a5c/` (gitignored).

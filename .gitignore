@@ -46,3 +46,6 @@ next-env.d.ts
 # Agent worktrees (ephemeral Claude Code agent state)
 .claude/worktrees/
 
+
+# Babysitter
+.a5c/runs/
