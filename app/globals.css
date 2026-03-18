@@ -190,3 +190,45 @@ select {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* --------------------------------------------------------------------------
+   5. iPad Safari — safe area insets & keyboard avoidance
+   -------------------------------------------------------------------------- */
+
+/**
+ * Safe area inset utilities for notch / home-bar on modern iPads.
+ * These classes are applied to fixed bottom bars and sticky headers
+ * so content is not obscured by the device chrome.
+ *
+ * viewport-fit=cover must be set in the <meta name="viewport"> tag
+ * (done via the Next.js `viewport` export in app/layout.tsx).
+ */
+
+/* Fixed bottom bar: add padding-bottom equal to the safe-area-inset-bottom
+   so the home indicator bar doesn't overlap action buttons. */
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* Sticky header: add padding-top equal to safe-area-inset-top for notch
+   (relevant when the app is used in landscape or as a PWA). */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Horizontal safe-area padding for landscape mode where the notch/camera
+   island eats into the left or right side of the screen. */
+.safe-inline {
+  padding-inline-start: env(safe-area-inset-right);
+  padding-inline-end:   env(safe-area-inset-left);
+}
+
+/* Utility: hide scrollbar while keeping scrollability (for BlockTabBar in
+   landscape where the tab strip may overflow horizontally). */
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Chrome / Safari / Opera */
+}

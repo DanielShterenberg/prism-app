@@ -513,9 +513,11 @@ export default function SummaryPage() {
 
       {/* ------------------------------------------------------------------ */}
       {/* Action bar — fixed at the bottom                                    */}
+      {/* safe-bottom adds env(safe-area-inset-bottom) padding for the iPad   */}
+      {/* home bar so action buttons are never hidden behind device chrome.    */}
       {/* ------------------------------------------------------------------ */}
-      <div className="fixed bottom-0 inset-x-0 z-10 bg-white border-t border-gray-200 shadow-lg">
-        <div className="max-w-2xl mx-auto px-4 py-4">
+      <div className="fixed bottom-0 inset-x-0 z-10 bg-white border-t border-gray-200 shadow-lg safe-bottom">
+        <div className="max-w-2xl mx-auto px-4 pt-4">
           <div className="flex gap-3">
             {/* ------------------------------------------------------------ */}
             {/* Edit button                                                    */}

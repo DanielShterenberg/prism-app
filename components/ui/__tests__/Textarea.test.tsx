@@ -63,4 +63,39 @@ describe("Textarea", () => {
     render(<Textarea error="שגיאה" />);
     expect(screen.getByRole("textbox").className).toMatch(/border-error/);
   });
+
+  // ---------------------------------------------------------------------------
+  // iPad Safari keyboard avoidance
+  // ---------------------------------------------------------------------------
+
+  it("calls scrollIntoView on focus for keyboard avoidance", () => {
+    render(<Textarea label="הערות" id="kbd-test" />);
+    const textarea = screen.getByRole("textbox");
+
+    const scrollIntoView = jest.fn();
+    Object.defineProperty(textarea, "scrollIntoView", {
+      value: scrollIntoView,
+      writable: true,
+    });
+
+    fireEvent.focus(textarea);
+
+    expect(scrollIntoView).toHaveBeenCalledWith(
+      expect.objectContaining({ block: "nearest" })
+    );
+  });
+
+  it("still calls the caller-supplied onFocus after scrollIntoView", () => {
+    const onFocus = jest.fn();
+    render(<Textarea label="הערות" id="onfocus-test" onFocus={onFocus} />);
+    const textarea = screen.getByRole("textbox");
+
+    Object.defineProperty(textarea, "scrollIntoView", {
+      value: jest.fn(),
+      writable: true,
+    });
+
+    fireEvent.focus(textarea);
+    expect(onFocus).toHaveBeenCalledTimes(1);
+  });
 });

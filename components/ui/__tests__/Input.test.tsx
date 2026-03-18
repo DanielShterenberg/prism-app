@@ -65,4 +65,39 @@ describe("Input", () => {
     render(<Input />);
     expect(screen.getByRole("textbox").className).toMatch(/text-base/);
   });
+
+  // ---------------------------------------------------------------------------
+  // iPad Safari keyboard avoidance
+  // ---------------------------------------------------------------------------
+
+  it("calls scrollIntoView on focus for keyboard avoidance", () => {
+    render(<Input label="שם" id="kbd-test" />);
+    const input = screen.getByRole("textbox");
+
+    const scrollIntoView = jest.fn();
+    Object.defineProperty(input, "scrollIntoView", {
+      value: scrollIntoView,
+      writable: true,
+    });
+
+    fireEvent.focus(input);
+
+    expect(scrollIntoView).toHaveBeenCalledWith(
+      expect.objectContaining({ block: "nearest" })
+    );
+  });
+
+  it("still calls the caller-supplied onFocus after scrollIntoView", () => {
+    const onFocus = jest.fn();
+    render(<Input label="שם" id="onfocus-test" onFocus={onFocus} />);
+    const input = screen.getByRole("textbox");
+
+    Object.defineProperty(input, "scrollIntoView", {
+      value: jest.fn(),
+      writable: true,
+    });
+
+    fireEvent.focus(input);
+    expect(onFocus).toHaveBeenCalledTimes(1);
+  });
 });
