@@ -1,26 +1,192 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Prism Design System — CSS custom properties + Tailwind v4 @theme
+   ==========================================================================
+   Color palette:
+     Navy primary  #1E3A5F  (dark mode: #4A7FA5)
+     Teal accent   #0D9488  (dark mode: #2DD4BF)
+     Neutrals      gray-50 → gray-950
+   Typography:
+     Inter (Latin) + system Hebrew stack
+     Scale: 12 / 14 / 16 / 20 / 24 / 32 px
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CSS custom properties — light mode defaults
+   -------------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Background / surface */
+  --background:        #ffffff;
+  --surface:           #f8fafc;
+  --surface-elevated:  #ffffff;
+
+  /* Foreground / text */
+  --foreground:        #0f172a;
+  --foreground-muted:  #64748b;
+  --foreground-subtle: #94a3b8;
+
+  /* Primary navy */
+  --primary:           #1E3A5F;
+  --primary-hover:     #16304f;
+  --primary-active:    #0e2340;
+  --primary-light:     #e8eef5;
+  --primary-foreground: #ffffff;
+
+  /* Accent teal */
+  --accent:            #0D9488;
+  --accent-hover:      #0b7a6f;
+  --accent-active:     #096158;
+  --accent-light:      #e0f5f3;
+  --accent-foreground: #ffffff;
+
+  /* Semantic */
+  --success:           #16a34a;
+  --success-light:     #dcfce7;
+  --success-foreground: #14532d;
+
+  --warning:           #d97706;
+  --warning-light:     #fef3c7;
+  --warning-foreground: #78350f;
+
+  --error:             #dc2626;
+  --error-light:       #fee2e2;
+  --error-foreground:  #7f1d1d;
+
+  /* Borders */
+  --border:            #e2e8f0;
+  --border-strong:     #cbd5e1;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow:    0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* --------------------------------------------------------------------------
+   2. Dark mode overrides via prefers-color-scheme
+   -------------------------------------------------------------------------- */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background:        #0f172a;
+    --surface:           #1e293b;
+    --surface-elevated:  #334155;
+
+    --foreground:        #f1f5f9;
+    --foreground-muted:  #94a3b8;
+    --foreground-subtle: #64748b;
+
+    --primary:           #4A7FA5;
+    --primary-hover:     #5a8fb5;
+    --primary-active:    #6a9fc5;
+    --primary-light:     #1e3a5f;
+    --primary-foreground: #ffffff;
+
+    --accent:            #2DD4BF;
+    --accent-hover:      #3de4cf;
+    --accent-active:     #4ef4df;
+    --accent-light:      #0d3330;
+    --accent-foreground: #0f172a;
+
+    --success:           #4ade80;
+    --success-light:     #14532d;
+    --success-foreground: #dcfce7;
+
+    --warning:           #fbbf24;
+    --warning-light:     #78350f;
+    --warning-foreground: #fef3c7;
+
+    --error:             #f87171;
+    --error-light:       #7f1d1d;
+    --error-foreground:  #fee2e2;
+
+    --border:            #334155;
+    --border-strong:     #475569;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow:    0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
   }
 }
 
+/* --------------------------------------------------------------------------
+   3. Tailwind v4 @theme — exposes CSS vars as Tailwind utilities
+   -------------------------------------------------------------------------- */
+@theme inline {
+  /* Colours */
+  --color-background:        var(--background);
+  --color-surface:           var(--surface);
+  --color-surface-elevated:  var(--surface-elevated);
+
+  --color-foreground:        var(--foreground);
+  --color-foreground-muted:  var(--foreground-muted);
+  --color-foreground-subtle: var(--foreground-subtle);
+
+  --color-primary:           var(--primary);
+  --color-primary-hover:     var(--primary-hover);
+  --color-primary-active:    var(--primary-active);
+  --color-primary-light:     var(--primary-light);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-accent:            var(--accent);
+  --color-accent-hover:      var(--accent-hover);
+  --color-accent-active:     var(--accent-active);
+  --color-accent-light:      var(--accent-light);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-success:           var(--success);
+  --color-success-light:     var(--success-light);
+  --color-success-foreground: var(--success-foreground);
+
+  --color-warning:           var(--warning);
+  --color-warning-light:     var(--warning-light);
+  --color-warning-foreground: var(--warning-foreground);
+
+  --color-error:             var(--error);
+  --color-error-light:       var(--error-light);
+  --color-error-foreground:  var(--error-foreground);
+
+  --color-border:            var(--border);
+  --color-border-strong:     var(--border-strong);
+
+  /* Typography */
+  --font-sans: "Inter", "Arial", system-ui, -apple-system, "Segoe UI",
+    "Noto Sans Hebrew", "Arial Hebrew", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Consolas", monospace;
+
+  /* Type scale: 12 / 14 / 16 / 20 / 24 / 32 px */
+  --text-xs:   0.75rem;   /* 12px */
+  --text-sm:   0.875rem;  /* 14px */
+  --text-base: 1rem;      /* 16px — minimum for iPad Safari no-zoom */
+  --text-lg:   1.25rem;   /* 20px */
+  --text-xl:   1.5rem;    /* 24px */
+  --text-2xl:  2rem;      /* 32px */
+}
+
+/* --------------------------------------------------------------------------
+   4. Base styles
+   -------------------------------------------------------------------------- */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 1rem;         /* 16px base */
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure inputs never trigger iPad Safari auto-zoom */
+input,
+textarea,
+select {
+  font-size: 1rem; /* 16px minimum */
+}
+
+/* RTL-aware focus ring utility */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
