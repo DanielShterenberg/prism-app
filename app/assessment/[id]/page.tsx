@@ -27,6 +27,8 @@ import BlockB from "@/components/BlockB";
 import BlockC from "@/components/BlockC";
 import BlockD from "@/components/BlockD";
 import BlockE from "@/components/BlockE";
+import AssessmentSidebar from "@/components/AssessmentSidebar";
+import NewAssessmentModal from "@/components/NewAssessmentModal";
 import type { Assessment } from "@/types/assessment";
 import type { BlockId } from "@/components/BlockTabBar";
 
@@ -73,6 +75,7 @@ export default function AssessmentPage() {
 
   const { assessment, notFound, refresh } = useAssessment(id);
   const [activeBlock, setActiveBlock] = useState<BlockId>("A");
+  const [newAssessmentModalOpen, setNewAssessmentModalOpen] = useState(false);
 
   // Snapshot passed to useSync — updated whenever a block saves.
   const [syncSnapshot, setSyncSnapshot] = useState<Assessment | null>(null);
@@ -135,115 +138,239 @@ export default function AssessmentPage() {
   const completedBlocks = getCompletedBlocks(assessment);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* ------------------------------------------------------------------ */}
-      {/* Header                                                               */}
-      {/* ------------------------------------------------------------------ */}
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          {/* Back button + patient name row */}
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => router.push("/")}
-              aria-label="חזרה לרשימה"
-              className={[
-                // Touch target ≥ 44px
-                "w-11 h-11 flex items-center justify-center rounded-full",
-                "text-gray-500 hover:text-gray-800 hover:bg-gray-100",
-                "transition-colors duration-150",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
-                "flex-shrink-0",
-              ].join(" ")}
-            >
-              {/* Right-pointing chevron — in RTL this visually points "back" (to the right) */}
-              <svg
-                viewBox="0 0 24 24"
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+    <>
+      {/* ================================================================== */}
+      {/* Desktop two-column layout                                           */}
+      {/*                                                                    */}
+      {/* Mobile (< lg): single-column — classic sticky header + content     */}
+      {/* Desktop (≥ lg): sidebar on the right (RTL), content on the left   */}
+      {/*   The outer wrapper constrains to ~900px and centers horizontally  */}
+      {/* ================================================================== */}
+      <div className="min-h-screen bg-gray-50">
+        {/* ---------------------------------------------------------------- */}
+        {/* Mobile header — hidden on desktop                                */}
+        {/* ---------------------------------------------------------------- */}
+        <header
+          className="lg:hidden sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm"
+          aria-label="כותרת הערכה"
+        >
+          <div className="px-4 py-4">
+            {/* Back button + patient name row */}
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => router.push("/")}
+                aria-label="חזרה לרשימה"
+                className={[
+                  "w-11 h-11 flex items-center justify-center rounded-full",
+                  "text-gray-500 hover:text-gray-800 hover:bg-gray-100",
+                  "transition-colors duration-150",
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
+                  "flex-shrink-0",
+                ].join(" ")}
               >
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
 
-            <div className="flex-1 min-w-0">
-              <h1 className="text-[17px] font-bold text-gray-900 leading-snug truncate">
-                {patientName}
-              </h1>
-              {assessmentDate && (
-                <p className="text-sm text-gray-500 leading-tight mt-0.5">
-                  {assessmentDate}
-                </p>
-              )}
+              <div className="flex-1 min-w-0">
+                <h1 className="text-[17px] font-bold text-gray-900 leading-snug truncate">
+                  {patientName}
+                </h1>
+                {assessmentDate && (
+                  <p className="text-sm text-gray-500 leading-tight mt-0.5">
+                    {assessmentDate}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Block tab bar — sits below the header row, still inside <header> */}
-        <div className="max-w-2xl mx-auto">
+          {/* Block tab bar — mobile only */}
           <BlockTabBar
             activeBlock={activeBlock}
             completedBlocks={completedBlocks}
             onSelectBlock={setActiveBlock}
           />
-        </div>
-      </header>
+        </header>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Block content area                                                   */}
-      {/* ------------------------------------------------------------------ */}
-      <main
-        className="flex-1 max-w-2xl w-full mx-auto px-4 py-6 pb-32"
-        aria-label={`בלוק ${activeBlock}`}
-      >
-        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
-          {activeBlock === "A" && (
-            <BlockA assessment={assessment} onUpdate={handleBlockUpdate} />
-          )}
-          {activeBlock === "B" && (
-            <BlockB assessment={assessment} onUpdate={handleBlockUpdate} />
-          )}
-          {activeBlock === "C" && (
-            <BlockC assessment={assessment} onUpdate={handleBlockUpdate} />
-          )}
-          {activeBlock === "D" && (
-            <BlockD assessment={assessment} onUpdate={handleBlockUpdate} />
-          )}
-          {activeBlock === "E" && (
-            <BlockE assessment={assessment} onUpdate={handleBlockUpdate} />
-          )}
-        </div>
-      </main>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* Finish button — fixed at the bottom                                  */}
-      {/* safe-bottom adds env(safe-area-inset-bottom) padding for the iPad   */}
-      {/* home bar so the button is never hidden behind device chrome.         */}
-      {/* ------------------------------------------------------------------ */}
-      <div className="fixed bottom-0 inset-x-0 z-10 bg-white border-t border-gray-200 shadow-lg safe-bottom">
-        <div className="max-w-2xl mx-auto px-4 pt-4">
-          <button
-            type="button"
-            onClick={handleFinish}
+        {/* ---------------------------------------------------------------- */}
+        {/* Desktop + mobile content wrapper                                  */}
+        {/* ---------------------------------------------------------------- */}
+        <div className="max-w-[900px] mx-auto lg:px-6 lg:py-6 lg:flex lg:gap-0 lg:items-start lg:min-h-screen">
+          {/* ============================================================== */}
+          {/* Sidebar — right side in RTL, desktop only                       */}
+          {/* ============================================================== */}
+          <div
             className={[
-              "w-full rounded-xl bg-blue-600 text-white",
-              "py-3 px-6",
-              "text-[17px] font-semibold",
-              // Touch target height: py-3 + text ≈ 52px, above 44px minimum
-              "min-h-[52px]",
-              "hover:bg-blue-700 active:scale-[0.99] transition-all duration-150",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
+              // Hidden on mobile — shown as sticky column on desktop
+              "hidden lg:flex lg:flex-col",
+              // Width
+              "lg:w-64 xl:w-72",
+              // Sticky so it stays visible while scrolling content
+              "lg:sticky lg:top-6",
+              // Max height prevents sidebar from overflowing viewport
+              "lg:max-h-[calc(100vh-3rem)]",
+              // Order: in RTL, sidebar is on the right → order-last in flex
+              "lg:order-last",
+              // Rounded card
+              "rounded-2xl overflow-hidden border border-gray-200 shadow-sm",
             ].join(" ")}
           >
-            סיום
-          </button>
+            <AssessmentSidebar
+              activeId={id}
+              onNewAssessment={() => setNewAssessmentModalOpen(true)}
+            />
+          </div>
+
+          {/* ============================================================== */}
+          {/* Main content column                                              */}
+          {/* ============================================================== */}
+          <div className="flex-1 min-w-0 lg:pe-4 flex flex-col">
+            {/* Desktop header — hidden on mobile */}
+            <div
+              className={[
+                "hidden lg:block",
+                "bg-white rounded-2xl border border-gray-200 shadow-sm",
+                "px-6 py-4 mb-4",
+              ].join(" ")}
+            >
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => router.push("/")}
+                  aria-label="חזרה לרשימה"
+                  className={[
+                    "w-11 h-11 flex items-center justify-center rounded-full",
+                    "text-gray-500 hover:text-gray-800 hover:bg-gray-100",
+                    "transition-colors duration-150",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
+                    "flex-shrink-0",
+                  ].join(" ")}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </button>
+
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-[17px] font-bold text-gray-900 leading-snug truncate">
+                    {patientName}
+                  </h1>
+                  {assessmentDate && (
+                    <p className="text-sm text-gray-500 leading-tight mt-0.5">
+                      {assessmentDate}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Block tab bar — desktop */}
+              <div className="mt-3 -mx-6 border-t border-gray-100">
+                <BlockTabBar
+                  activeBlock={activeBlock}
+                  completedBlocks={completedBlocks}
+                  onSelectBlock={setActiveBlock}
+                />
+              </div>
+            </div>
+
+            {/* Block content area */}
+            <main
+              id="block-content"
+              className="flex-1 px-4 lg:px-0 py-6 lg:py-0 pb-32 lg:pb-24"
+              aria-label={`טופס בלוק ${activeBlock}`}
+            >
+              <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
+                {activeBlock === "A" && (
+                  <BlockA assessment={assessment} onUpdate={handleBlockUpdate} />
+                )}
+                {activeBlock === "B" && (
+                  <BlockB assessment={assessment} onUpdate={handleBlockUpdate} />
+                )}
+                {activeBlock === "C" && (
+                  <BlockC assessment={assessment} onUpdate={handleBlockUpdate} />
+                )}
+                {activeBlock === "D" && (
+                  <BlockD assessment={assessment} onUpdate={handleBlockUpdate} />
+                )}
+                {activeBlock === "E" && (
+                  <BlockE assessment={assessment} onUpdate={handleBlockUpdate} />
+                )}
+              </div>
+            </main>
+
+            {/* ------------------------------------------------------------ */}
+            {/* Finish button                                                  */}
+            {/* Mobile: fixed at bottom of viewport                           */}
+            {/* Desktop: static inside the content column                     */}
+            {/* ------------------------------------------------------------ */}
+            {/* Mobile finish bar */}
+            <div className="lg:hidden fixed bottom-0 inset-x-0 z-10 bg-white border-t border-gray-200 shadow-lg safe-bottom">
+              <div className="px-4 pt-4">
+                <button
+                  type="button"
+                  onClick={handleFinish}
+                  aria-describedby="block-content"
+                  className={[
+                    "w-full rounded-xl bg-blue-600 text-white",
+                    "py-3 px-6",
+                    "text-[17px] font-semibold",
+                    "min-h-[52px]",
+                    "hover:bg-blue-700 active:scale-[0.99] transition-all duration-150",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
+                  ].join(" ")}
+                >
+                  סיום
+                </button>
+              </div>
+            </div>
+
+            {/* Desktop finish button — inline */}
+            <div className="hidden lg:block px-0 pb-6">
+              <button
+                type="button"
+                onClick={handleFinish}
+                aria-describedby="block-content"
+                className={[
+                  "w-full rounded-xl bg-blue-600 text-white",
+                  "py-3 px-6",
+                  "text-[17px] font-semibold",
+                  "min-h-[52px]",
+                  "hover:bg-blue-700 active:scale-[0.99] transition-all duration-150",
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
+                ].join(" ")}
+              >
+                סיום
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* New Assessment Modal — triggered from desktop sidebar */}
+      {newAssessmentModalOpen && (
+        <NewAssessmentModal onClose={() => setNewAssessmentModalOpen(false)} />
+      )}
+    </>
   );
 }

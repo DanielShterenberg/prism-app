@@ -48,6 +48,18 @@ jest.mock("@/hooks/useSync", () => ({
   useSync: jest.fn(),
 }));
 
+// AssessmentSidebar (rendered on desktop) uses useAssessments — stub it out
+// to prevent it from calling listAssessments / fetch in the test environment.
+jest.mock("@/hooks/useAssessments", () => ({
+  useAssessments: () => ({
+    assessments: [],
+    loading: false,
+    cloudError: null,
+    syncing: false,
+    refresh: jest.fn(),
+  }),
+}));
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -126,16 +138,18 @@ describe("SummaryPage", () => {
     it("renders the patient name in the h1 heading", () => {
       mockFound(makeAssessment());
       render(<SummaryPage />);
-      // Patient name appears in both the h1 and potentially as a field value —
-      // assert via the heading element directly
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toHaveTextContent("ילד בדיקה");
+      // Patient name appears in both mobile and desktop h1 headings —
+      // use getAllByRole and confirm at least one heading contains the name
+      const headings = screen.getAllByRole("heading", { level: 1 });
+      expect(headings.some((h) => h.textContent?.includes("ילד בדיקה"))).toBe(true);
     });
 
     it("renders the 'סיכום ערכה' subtitle", () => {
       mockFound(makeAssessment());
       render(<SummaryPage />);
-      expect(screen.getByText(/סיכום ערכה/)).toBeInTheDocument();
+      // Subtitle appears in both mobile and desktop headers
+      const subtitles = screen.getAllByText(/סיכום ערכה/);
+      expect(subtitles.length).toBeGreaterThanOrEqual(1);
     });
 
     it("shows 'הושלם' badge when assessment is completed", () => {
@@ -337,17 +351,20 @@ describe("SummaryPage", () => {
     it('"ייצוא" button is disabled', () => {
       mockFound(makeAssessment());
       render(<SummaryPage />);
-      const exportBtn = screen.getByText("ייצוא").closest("button");
-      expect(exportBtn).toBeDisabled();
+      // Two export buttons rendered (mobile + desktop) — both should be disabled
+      const exportBtns = screen.getAllByText("ייצוא").map((el) => el.closest("button"));
+      expect(exportBtns.length).toBeGreaterThanOrEqual(1);
+      exportBtns.forEach((btn) => expect(btn).toBeDisabled());
     });
 
     it('"ייצוא" button has aria-label mentioning "בקרוב בגרסה 2"', () => {
       mockFound(makeAssessment());
       render(<SummaryPage />);
-      const exportBtn = screen.getByRole("button", {
+      // Two export buttons (mobile + desktop) — at least one should have the aria-label
+      const exportBtns = screen.getAllByRole("button", {
         name: /בקרוב בגרסה 2/,
       });
-      expect(exportBtn).toBeInTheDocument();
+      expect(exportBtns.length).toBeGreaterThanOrEqual(1);
     });
 
     it('"סמן כהושלם" calls updateAssessment with status completed', () => {
@@ -363,7 +380,9 @@ describe("SummaryPage", () => {
       mockFound(assessment);
       render(<SummaryPage />);
 
-      fireEvent.click(screen.getByText("סמן כהושלם"));
+      // Two "סמן כהושלם" buttons (mobile + desktop) — click the first
+      const completeButtons = screen.getAllByText("סמן כהושלם");
+      fireEvent.click(completeButtons[0]);
 
       expect(localStorageLib.updateAssessment).toHaveBeenCalledWith(
         "test-id-summary",

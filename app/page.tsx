@@ -38,7 +38,7 @@ export default function HomePage() {
       {/* Header                                                               */}
       {/* ------------------------------------------------------------------ */}
       <header className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-4 lg:px-8 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-gray-900">הערכות</h1>
 
           {/* Cloud sync spinner — visible only while background sync runs */}
@@ -57,7 +57,10 @@ export default function HomePage() {
       {/* ------------------------------------------------------------------ */}
       {/* Content                                                              */}
       {/* ------------------------------------------------------------------ */}
-      <section className="max-w-2xl mx-auto px-4 pt-6">
+      <section
+        className="max-w-4xl mx-auto px-4 lg:px-8 pt-6"
+        aria-label="רשימת הערכות"
+      >
         {loading ? (
           /* Skeleton — only shown during the initial localStorage read (usually <1 frame) */
           <div
@@ -100,7 +103,7 @@ export default function HomePage() {
       <button
         type="button"
         onClick={handleNewAssessment}
-        aria-label="הערכה חדשה"
+        aria-label="הערכה חדשה — לחץ ליצירת הערכה חדשה"
         className={[
           // Position — bottom-left in RTL (start = right side of screen in LTR, left in RTL)
           "fixed bottom-6 start-6",

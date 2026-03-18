@@ -25,6 +25,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useAssessment } from "@/hooks/useAssessment";
 import { useSync } from "@/hooks/useSync";
 import { updateAssessment } from "@/lib/localStorage";
+import AssessmentSidebar from "@/components/AssessmentSidebar";
+import NewAssessmentModal from "@/components/NewAssessmentModal";
 import type {
   Assessment,
   Identification,
@@ -352,6 +354,9 @@ export default function SummaryPage() {
   // Local state to track if "Mark as Completed" is in progress
   const [isCompleting, setIsCompleting] = useState(false);
 
+  // New assessment modal — opened from desktop sidebar
+  const [newAssessmentModalOpen, setNewAssessmentModalOpen] = useState(false);
+
   // Snapshot passed to useSync — set when Mark as Completed is pressed
   const [syncSnapshot, setSyncSnapshot] = useState<Assessment | null>(null);
 
@@ -417,185 +422,314 @@ export default function SummaryPage() {
   const isCompleted = assessment.status === "completed";
   const blockSummaries = buildBlockSummaries(assessment);
 
+  // Shared action buttons JSX — reused in both the mobile bottom bar and
+  // the desktop inline action bar. Stored as a variable (not a component
+  // function) to satisfy the react-hooks/static-components lint rule.
+  const actionButtonsJsx = (
+    <div className="flex gap-3">
+      {/* ------------------------------------------------------------------ */}
+      {/* Edit button                                                          */}
+      {/* ------------------------------------------------------------------ */}
+      <button
+        type="button"
+        onClick={handleEdit}
+        className={[
+          "flex-1 rounded-xl border border-gray-300 bg-white text-gray-700",
+          "py-3 px-4",
+          "text-[17px] font-medium",
+          "min-h-[52px]",
+          "hover:bg-gray-50 active:scale-[0.99] transition-all duration-150",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
+        ].join(" ")}
+      >
+        עריכה
+      </button>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Export / Share button — disabled in v1                               */}
+      {/* ------------------------------------------------------------------ */}
+      <div className="relative flex-shrink-0 group">
+        <button
+          type="button"
+          disabled
+          aria-disabled="true"
+          aria-label="ייצוא / שיתוף — בקרוב בגרסה 2"
+          className={[
+            "rounded-xl border border-gray-200 bg-gray-100 text-gray-400",
+            "py-3 px-4",
+            "text-[17px] font-medium",
+            "min-h-[52px]",
+            "cursor-not-allowed",
+            "focus:outline-none",
+          ].join(" ")}
+        >
+          ייצוא
+        </button>
+        {/* Tooltip */}
+        <div
+          role="tooltip"
+          className={[
+            "absolute bottom-full mb-2 right-0",
+            "px-3 py-1.5 rounded-lg",
+            "bg-gray-800 text-white text-[13px] whitespace-nowrap",
+            "opacity-0 group-hover:opacity-100 pointer-events-none",
+            "transition-opacity duration-150",
+          ].join(" ")}
+        >
+          בקרוב בגרסה 2
+        </div>
+      </div>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Mark as Completed button                                             */}
+      {/* ------------------------------------------------------------------ */}
+      <button
+        type="button"
+        onClick={handleMarkCompleted}
+        disabled={isCompleted || isCompleting}
+        aria-disabled={isCompleted || isCompleting}
+        className={[
+          "flex-1 rounded-xl text-white",
+          "py-3 px-4",
+          "text-[17px] font-semibold",
+          "min-h-[52px]",
+          isCompleted || isCompleting
+            ? "bg-green-400 cursor-default"
+            : "bg-blue-600 hover:bg-blue-700 active:scale-[0.99] transition-all duration-150",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
+        ].join(" ")}
+      >
+        {isCompleted ? "הושלם" : "סמן כהושלם"}
+      </button>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* ------------------------------------------------------------------ */}
-      {/* Header                                                               */}
-      {/* ------------------------------------------------------------------ */}
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            {/* Back button — navigates to /assessment/[id] */}
-            <button
-              type="button"
-              onClick={handleEdit}
-              aria-label="חזרה לטופס"
-              className={[
-                "w-11 h-11 flex items-center justify-center rounded-full",
-                "text-gray-500 hover:text-gray-800 hover:bg-gray-100",
-                "transition-colors duration-150",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
-                "flex-shrink-0",
-              ].join(" ")}
-            >
-              {/* Right-pointing chevron — in RTL this visually points "back" (to the right) */}
-              <svg
-                viewBox="0 0 24 24"
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
-
-            <div className="flex-1 min-w-0">
-              <h1 className="text-[17px] font-bold text-gray-900 leading-snug truncate">
-                {patientName}
-              </h1>
-              <p className="text-sm text-gray-500 leading-tight mt-0.5">
-                {assessmentDate ? `${assessmentDate} · ` : ""}
-                סיכום ערכה
-              </p>
-            </div>
-
-            {/* Completed badge */}
-            {isCompleted && (
-              <span
+    <>
+      {/* ================================================================== */}
+      {/* Desktop two-column layout                                           */}
+      {/* ================================================================== */}
+      <div className="min-h-screen bg-gray-50">
+        {/* ---------------------------------------------------------------- */}
+        {/* Mobile header — hidden on desktop                                */}
+        {/* ---------------------------------------------------------------- */}
+        <header
+          className="lg:hidden sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm"
+          aria-label="כותרת סיכום הערכה"
+        >
+          <div className="px-4 py-4">
+            <div className="flex items-center gap-3">
+              {/* Back button */}
+              <button
+                type="button"
+                onClick={handleEdit}
+                aria-label="חזרה לטופס"
                 className={[
-                  "flex-shrink-0 inline-flex items-center gap-1",
-                  "rounded-full bg-green-100 text-green-700",
-                  "px-3 py-1 text-[13px] font-medium",
+                  "w-11 h-11 flex items-center justify-center rounded-full",
+                  "text-gray-500 hover:text-gray-800 hover:bg-gray-100",
+                  "transition-colors duration-150",
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
+                  "flex-shrink-0",
                 ].join(" ")}
               >
                 <svg
-                  aria-hidden="true"
-                  viewBox="0 0 12 12"
-                  className="w-3 h-3"
+                  viewBox="0 0 24 24"
+                  className="w-5 h-5"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth={2}
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  aria-hidden="true"
                 >
-                  <polyline points="1.5,6 4.5,9 10.5,3" />
+                  <polyline points="9 18 15 12 9 6" />
                 </svg>
-                הושלם
-              </span>
-            )}
-          </div>
-        </div>
-      </header>
+              </button>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Content                                                              */}
-      {/* ------------------------------------------------------------------ */}
-      <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-6 pb-48">
-        {blockSummaries.length === 0 ? (
-          /* Empty state — no fields filled at all */
-          <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 text-center">
-            <p className="text-gray-500 text-[17px]">
-              לא הוזנו נתונים בטופס.
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-6">
-            {blockSummaries.map((block) => (
-              <BlockSection key={block.id} block={block} />
-            ))}
-          </div>
-        )}
-      </main>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-[17px] font-bold text-gray-900 leading-snug truncate">
+                  {patientName}
+                </h1>
+                <p className="text-sm text-gray-500 leading-tight mt-0.5">
+                  {assessmentDate ? `${assessmentDate} · ` : ""}
+                  סיכום ערכה
+                </p>
+              </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Action bar — fixed at the bottom                                    */}
-      {/* safe-bottom adds env(safe-area-inset-bottom) padding for the iPad   */}
-      {/* home bar so action buttons are never hidden behind device chrome.    */}
-      {/* ------------------------------------------------------------------ */}
-      <div className="fixed bottom-0 inset-x-0 z-10 bg-white border-t border-gray-200 shadow-lg safe-bottom">
-        <div className="max-w-2xl mx-auto px-4 pt-4">
-          <div className="flex gap-3">
-            {/* ------------------------------------------------------------ */}
-            {/* Edit button                                                    */}
-            {/* ------------------------------------------------------------ */}
-            <button
-              type="button"
-              onClick={handleEdit}
+              {/* Completed badge */}
+              {isCompleted && (
+                <span
+                  className={[
+                    "flex-shrink-0 inline-flex items-center gap-1",
+                    "rounded-full bg-green-100 text-green-700",
+                    "px-3 py-1 text-[13px] font-medium",
+                  ].join(" ")}
+                >
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 12 12"
+                    className="w-3 h-3"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="1.5,6 4.5,9 10.5,3" />
+                  </svg>
+                  הושלם
+                </span>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* Desktop + mobile content wrapper                                  */}
+        {/* ---------------------------------------------------------------- */}
+        <div className="max-w-[900px] mx-auto lg:px-6 lg:py-6 lg:flex lg:gap-0 lg:items-start lg:min-h-screen">
+          {/* ============================================================== */}
+          {/* Sidebar — right side in RTL, desktop only                       */}
+          {/* ============================================================== */}
+          <div
+            className={[
+              "hidden lg:flex lg:flex-col",
+              "lg:w-64 xl:w-72",
+              "lg:sticky lg:top-6",
+              "lg:max-h-[calc(100vh-3rem)]",
+              "lg:order-last",
+              "rounded-2xl overflow-hidden border border-gray-200 shadow-sm",
+            ].join(" ")}
+          >
+            <AssessmentSidebar
+              activeId={id}
+              onNewAssessment={() => setNewAssessmentModalOpen(true)}
+            />
+          </div>
+
+          {/* ============================================================== */}
+          {/* Main content column                                              */}
+          {/* ============================================================== */}
+          <div className="flex-1 min-w-0 lg:pe-4 flex flex-col">
+            {/* Desktop header — hidden on mobile */}
+            <div
               className={[
-                "flex-1 rounded-xl border border-gray-300 bg-white text-gray-700",
-                "py-3 px-4",
-                "text-[17px] font-medium",
-                "min-h-[52px]",
-                "hover:bg-gray-50 active:scale-[0.99] transition-all duration-150",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
+                "hidden lg:block",
+                "bg-white rounded-2xl border border-gray-200 shadow-sm",
+                "px-6 py-4 mb-4",
               ].join(" ")}
             >
-              עריכה
-            </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleEdit}
+                  aria-label="חזרה לטופס"
+                  className={[
+                    "w-11 h-11 flex items-center justify-center rounded-full",
+                    "text-gray-500 hover:text-gray-800 hover:bg-gray-100",
+                    "transition-colors duration-150",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
+                    "flex-shrink-0",
+                  ].join(" ")}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </button>
 
-            {/* ------------------------------------------------------------ */}
-            {/* Export / Share button — disabled in v1                         */}
-            {/* ------------------------------------------------------------ */}
-            <div className="relative flex-shrink-0 group">
-              <button
-                type="button"
-                disabled
-                aria-disabled="true"
-                aria-label='ייצוא / שיתוף — בקרוב בגרסה 2'
-                className={[
-                  "rounded-xl border border-gray-200 bg-gray-100 text-gray-400",
-                  "py-3 px-4",
-                  "text-[17px] font-medium",
-                  "min-h-[52px]",
-                  "cursor-not-allowed",
-                  "focus:outline-none",
-                ].join(" ")}
-              >
-                ייצוא
-              </button>
-              {/* Tooltip */}
-              <div
-                role="tooltip"
-                className={[
-                  "absolute bottom-full mb-2 right-0",
-                  "px-3 py-1.5 rounded-lg",
-                  "bg-gray-800 text-white text-[13px] whitespace-nowrap",
-                  "opacity-0 group-hover:opacity-100 pointer-events-none",
-                  "transition-opacity duration-150",
-                ].join(" ")}
-              >
-                בקרוב בגרסה 2
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-[17px] font-bold text-gray-900 leading-snug truncate">
+                    {patientName}
+                  </h1>
+                  <p className="text-sm text-gray-500 leading-tight mt-0.5">
+                    {assessmentDate ? `${assessmentDate} · ` : ""}
+                    סיכום ערכה
+                  </p>
+                </div>
+
+                {/* Completed badge */}
+                {isCompleted && (
+                  <span
+                    className={[
+                      "flex-shrink-0 inline-flex items-center gap-1",
+                      "rounded-full bg-green-100 text-green-700",
+                      "px-3 py-1 text-[13px] font-medium",
+                    ].join(" ")}
+                  >
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 12 12"
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="1.5,6 4.5,9 10.5,3" />
+                    </svg>
+                    הושלם
+                  </span>
+                )}
               </div>
             </div>
 
-            {/* ------------------------------------------------------------ */}
-            {/* Mark as Completed button                                       */}
-            {/* ------------------------------------------------------------ */}
-            <button
-              type="button"
-              onClick={handleMarkCompleted}
-              disabled={isCompleted || isCompleting}
-              aria-disabled={isCompleted || isCompleting}
-              className={[
-                "flex-1 rounded-xl text-white",
-                "py-3 px-4",
-                "text-[17px] font-semibold",
-                "min-h-[52px]",
-                isCompleted || isCompleting
-                  ? "bg-green-400 cursor-default"
-                  : "bg-blue-600 hover:bg-blue-700 active:scale-[0.99] transition-all duration-150",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
-              ].join(" ")}
+            {/* Summary content */}
+            <main
+              id="summary-content"
+              className="flex-1 px-4 lg:px-0 py-6 lg:py-0 pb-48 lg:pb-6"
+              aria-label="תוכן סיכום ערכה"
             >
-              {isCompleted ? "הושלם" : "סמן כהושלם"}
-            </button>
+              {blockSummaries.length === 0 ? (
+                /* Empty state — no fields filled at all */
+                <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 text-center">
+                  <p className="text-gray-500 text-[17px]">
+                    לא הוזנו נתונים בטופס.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-6">
+                  {blockSummaries.map((block) => (
+                    <BlockSection key={block.id} block={block} />
+                  ))}
+                </div>
+              )}
+            </main>
+
+            {/* ------------------------------------------------------------ */}
+            {/* Action bar — mobile: fixed bottom bar; desktop: inline        */}
+            {/* ------------------------------------------------------------ */}
+
+            {/* Mobile action bar */}
+            <div className="lg:hidden fixed bottom-0 inset-x-0 z-10 bg-white border-t border-gray-200 shadow-lg safe-bottom">
+              <div className="px-4 pt-4">
+                {actionButtonsJsx}
+              </div>
+            </div>
+
+            {/* Desktop action bar — inline */}
+            <div className="hidden lg:block px-0 pb-6">
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm px-4 py-4">
+                {actionButtonsJsx}
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* New Assessment Modal — triggered from desktop sidebar */}
+      {newAssessmentModalOpen && (
+        <NewAssessmentModal onClose={() => setNewAssessmentModalOpen(false)} />
+      )}
+    </>
   );
 }
