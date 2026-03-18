@@ -16,7 +16,7 @@ import { getUserId } from "@/lib/auth";
 // GET /api/assessments
 // ---------------------------------------------------------------------------
 export async function GET(req: NextRequest) {
-  const userId = getUserId(req);
+  const userId = await getUserId(req);
   if (!userId) {
     return NextResponse.json(
       { data: null, error: "Unauthorized" },
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 // POST /api/assessments
 // ---------------------------------------------------------------------------
 export async function POST(req: NextRequest) {
-  const userId = getUserId(req);
+  const userId = await getUserId(req);
   if (!userId) {
     return NextResponse.json(
       { data: null, error: "Unauthorized" },

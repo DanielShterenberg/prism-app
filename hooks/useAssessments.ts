@@ -39,7 +39,7 @@ function sortByUpdatedAt(list: Assessment[]): Assessment[] {
   );
 }
 
-export function useAssessments(): UseAssessmentsReturn {
+export function useAssessments(authToken?: string): UseAssessmentsReturn {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
   const [cloudError, setCloudError] = useState<Error | null>(null);
@@ -58,7 +58,9 @@ export function useAssessments(): UseAssessmentsReturn {
     setCloudError(null);
 
     try {
-      const res = await fetch("/api/assessments");
+      const headers: Record<string, string> = {};
+      if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
+      const res = await fetch("/api/assessments", { headers });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const cloud: Assessment[] = await res.json();
@@ -103,7 +105,7 @@ export function useAssessments(): UseAssessmentsReturn {
     } finally {
       setSyncing(false);
     }
-  }, []);
+  }, [authToken]);
 
   const refresh = useCallback(() => {
     loadLocal();

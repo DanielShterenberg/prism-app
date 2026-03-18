@@ -15,12 +15,14 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAssessments } from "@/hooks/useAssessments";
+import { useAuth } from "@/components/AuthProvider";
 import AssessmentCard from "@/components/AssessmentCard";
 import NewAssessmentModal from "@/components/NewAssessmentModal";
 import OnboardingModal from "@/components/OnboardingModal";
 
 export default function HomePage() {
-  const { assessments, loading, syncing } = useAssessments();
+  const { token } = useAuth();
+  const { assessments, loading, syncing } = useAssessments(token ?? undefined);
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
 

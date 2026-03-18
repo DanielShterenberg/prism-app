@@ -1,27 +1,16 @@
 /**
  * Auth helper for API routes.
  *
- * v1 stub: validates that an Authorization header is present and non-empty.
- * Returns the userId extracted from the token, or null if the header is
- * missing/malformed.
+ * Verifies the Firebase ID token from the Authorization header and returns
+ * the Firebase UID, or null if the token is missing or invalid.
  *
- * In a future iteration this will be replaced with a real JWT / Clerk
- * verification call.  All API route handlers call this and return 401 if
- * null is returned — so swapping the implementation here is all that is
- * needed to add real auth.
+ * Expected format: `Authorization: Bearer <firebase-id-token>`
  */
 
 import { NextRequest } from "next/server";
+import { getAdminAuth } from "./firebase-admin";
 
-/**
- * Extracts and validates the Authorization header from a request.
- *
- * Expected format: `Authorization: Bearer <token>`
- *
- * Returns the token string to use as the userId stub in v1, or null when the
- * header is absent or malformed.
- */
-export function getUserId(req: NextRequest): string | null {
+export async function getUserId(req: NextRequest): Promise<string | null> {
   const authHeader = req.headers.get("authorization");
   if (!authHeader) return null;
 
@@ -31,7 +20,10 @@ export function getUserId(req: NextRequest): string | null {
   const token = parts[1].trim();
   if (!token) return null;
 
-  // v1 stub — accept any non-empty token; use the token value as the userId
-  // so that records created by different tokens stay isolated.
-  return token;
+  try {
+    const decoded = await getAdminAuth().verifyIdToken(token);
+    return decoded.uid;
+  } catch {
+    return null;
+  }
 }

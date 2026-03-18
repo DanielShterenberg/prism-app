@@ -21,7 +21,7 @@ type RouteContext = { params: Promise<{ id: string }> };
 // GET /api/assessments/:id
 // ---------------------------------------------------------------------------
 export async function GET(req: NextRequest, context: RouteContext) {
-  const userId = getUserId(req);
+  const userId = await getUserId(req);
   if (!userId) {
     return NextResponse.json(
       { data: null, error: "Unauthorized" },
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
 // PUT /api/assessments/:id
 // ---------------------------------------------------------------------------
 export async function PUT(req: NextRequest, context: RouteContext) {
-  const userId = getUserId(req);
+  const userId = await getUserId(req);
   if (!userId) {
     return NextResponse.json(
       { data: null, error: "Unauthorized" },
@@ -134,7 +134,7 @@ export async function PUT(req: NextRequest, context: RouteContext) {
 // DELETE /api/assessments/:id
 // ---------------------------------------------------------------------------
 export async function DELETE(req: NextRequest, context: RouteContext) {
-  const userId = getUserId(req);
+  const userId = await getUserId(req);
   if (!userId) {
     return NextResponse.json(
       { data: null, error: "Unauthorized" },

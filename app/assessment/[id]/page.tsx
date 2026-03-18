@@ -21,6 +21,7 @@ import React, { useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAssessment } from "@/hooks/useAssessment";
 import { useSync } from "@/hooks/useSync";
+import { useAuth } from "@/components/AuthProvider";
 import BlockTabBar, { BLOCKS } from "@/components/BlockTabBar";
 import BlockA from "@/components/BlockA";
 import BlockB from "@/components/BlockB";
@@ -73,6 +74,7 @@ export default function AssessmentPage() {
   const router = useRouter();
   const id = typeof params?.id === "string" ? params.id : "";
 
+  const { token } = useAuth();
   const { assessment, notFound, refresh } = useAssessment(id);
   const [activeBlock, setActiveBlock] = useState<BlockId>("A");
   const [newAssessmentModalOpen, setNewAssessmentModalOpen] = useState(false);
@@ -83,6 +85,7 @@ export default function AssessmentPage() {
   // Sync hook — debounced cloud sync, offline-first.
   useSync({
     assessment: syncSnapshot,
+    authToken: token ?? undefined,
     onSyncStatusChange: () => {
       // Refresh local state after sync outcome so syncStatus indicator stays accurate.
       refresh();
