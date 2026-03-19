@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
 } from "firebase/auth";
 import { getClientAuth } from "@/lib/firebase";
@@ -18,6 +19,23 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+
+  // Handle the redirect result when returning from Google
+  useEffect(() => {
+    setGoogleLoading(true);
+    getRedirectResult(getClientAuth())
+      .then((result) => {
+        if (result) {
+          router.replace("/");
+        }
+      })
+      .catch(() => {
+        setError("הכניסה עם Google נכשלה, נסה שנית");
+      })
+      .finally(() => {
+        setGoogleLoading(false);
+      });
+  }, [router]);
 
   async function handleEmailSubmit(e: FormEvent) {
     e.preventDefault();
@@ -37,11 +55,9 @@ export default function LoginPage() {
     setError(null);
     setGoogleLoading(true);
     try {
-      await signInWithPopup(getClientAuth(), googleProvider);
-      router.replace("/");
+      await signInWithRedirect(getClientAuth(), googleProvider);
     } catch {
       setError("הכניסה עם Google נכשלה, נסה שנית");
-    } finally {
       setGoogleLoading(false);
     }
   }
