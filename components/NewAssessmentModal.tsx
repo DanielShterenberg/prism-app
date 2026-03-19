@@ -205,7 +205,7 @@ export default function NewAssessmentModal({ onClose }: NewAssessmentModalProps)
               className={[
                 "w-full rounded-xl border px-4 py-3",
                 // Font ≥ 16pt prevents iPad Safari auto-zoom
-                "text-[17px] leading-snug",
+                "text-[17px] leading-snug text-gray-900",
                 "placeholder:text-gray-400",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
                 "transition-colors duration-150",
@@ -241,7 +241,7 @@ export default function NewAssessmentModal({ onClose }: NewAssessmentModalProps)
               className={[
                 "w-full rounded-xl border border-gray-300 bg-white px-4 py-3",
                 // Font ≥ 16pt prevents iPad Safari auto-zoom
-                "text-[17px] leading-snug",
+                "text-[17px] leading-snug text-gray-900",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
                 "transition-colors duration-150",
               ].join(" ")}
