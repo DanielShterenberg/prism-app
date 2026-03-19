@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   signInWithEmailAndPassword,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
 import { getClientAuth } from "@/lib/firebase";
@@ -19,23 +18,6 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-
-  // Handle the redirect result when returning from Google
-  useEffect(() => {
-    setGoogleLoading(true);
-    getRedirectResult(getClientAuth())
-      .then((result) => {
-        if (result) {
-          router.replace("/");
-        }
-      })
-      .catch((err) => {
-        setError(err?.code ?? err?.message ?? "unknown error");
-      })
-      .finally(() => {
-        setGoogleLoading(false);
-      });
-  }, [router]);
 
   async function handleEmailSubmit(e: FormEvent) {
     e.preventDefault();
@@ -55,10 +37,12 @@ export default function LoginPage() {
     setError(null);
     setGoogleLoading(true);
     try {
-      await signInWithRedirect(getClientAuth(), googleProvider);
+      await signInWithPopup(getClientAuth(), googleProvider);
+      router.replace("/");
     } catch (err: unknown) {
       const e = err as { code?: string; message?: string };
-      setError(e?.code ?? e?.message ?? "unknown error");
+      setError(e?.code ?? e?.message ?? "הכניסה עם Google נכשלה, נסה שנית");
+    } finally {
       setGoogleLoading(false);
     }
   }
@@ -69,7 +53,6 @@ export default function LoginPage() {
         <h1 className="text-2xl font-semibold text-gray-900 mb-2">Prism</h1>
         <p className="text-sm text-gray-500 mb-8">כלי הערכה ASD</p>
 
-        {/* Google Sign-In */}
         <button
           type="button"
           onClick={handleGoogleSignIn}
@@ -85,7 +68,6 @@ export default function LoginPage() {
           {googleLoading ? "מתחבר..." : "כניסה עם Google"}
         </button>
 
-        {/* Divider */}
         <div className="relative mb-6">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-200" />
@@ -95,12 +77,9 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Email/Password */}
         <form onSubmit={handleEmailSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-sm font-medium text-gray-700">
-              אימייל
-            </label>
+            <label htmlFor="email" className="text-sm font-medium text-gray-700">אימייל</label>
             <input
               id="email"
               type="email"
@@ -115,9 +94,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" className="text-sm font-medium text-gray-700">
-              סיסמה
-            </label>
+            <label htmlFor="password" className="text-sm font-medium text-gray-700">סיסמה</label>
             <input
               id="password"
               type="password"
@@ -132,7 +109,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">
+            <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2 break-all">
               {error}
             </p>
           )}
