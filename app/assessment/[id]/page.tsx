@@ -117,14 +117,8 @@ export default function AssessmentPage() {
         <button
           type="button"
           onClick={() => router.push("/")}
-          className={[
-            "rounded-xl bg-blue-600 text-white px-6 py-3",
-            "text-[17px] font-medium",
-            "hover:bg-blue-700 active:scale-[0.98] transition-all duration-150",
-            "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
-            // Touch target ≥ 44px
-            "min-h-[48px]",
-          ].join(" ")}
+          className="rounded-xl text-white px-6 py-3 text-[17px] font-medium active:scale-[0.98] transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 min-h-[48px]"
+          style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}
         >
           חזרה לרשימה
         </button>
@@ -154,23 +148,18 @@ export default function AssessmentPage() {
         {/* Mobile header — hidden on desktop                                */}
         {/* ---------------------------------------------------------------- */}
         <header
-          className="lg:hidden sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm"
+          className="lg:hidden sticky top-0 z-10"
           aria-label="כותרת הערכה"
         >
-          <div className="px-4 py-4">
+          <div className="px-4 py-4" style={{ backgroundColor: "#09090f" }}>
             {/* Back button + patient name row */}
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => router.push("/")}
                 aria-label="חזרה לרשימה"
-                className={[
-                  "w-11 h-11 flex items-center justify-center rounded-full",
-                  "text-gray-500 hover:text-gray-800 hover:bg-gray-100",
-                  "transition-colors duration-150",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
-                  "flex-shrink-0",
-                ].join(" ")}
+                className="w-11 h-11 flex items-center justify-center rounded-full flex-shrink-0 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                style={{ color: "rgba(255,255,255,0.6)" }}
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -187,11 +176,11 @@ export default function AssessmentPage() {
               </button>
 
               <div className="flex-1 min-w-0">
-                <h1 className="text-[17px] font-bold text-gray-900 leading-snug truncate">
+                <h1 className="text-[17px] font-bold text-white leading-snug truncate">
                   {patientName}
                 </h1>
                 {assessmentDate && (
-                  <p className="text-sm text-gray-500 leading-tight mt-0.5">
+                  <p className="text-sm leading-tight mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
                     {assessmentDate}
                   </p>
                 )}
@@ -241,60 +230,49 @@ export default function AssessmentPage() {
           {/* ============================================================== */}
           <div className="flex-1 min-w-0 lg:pe-4 flex flex-col">
             {/* Desktop header — hidden on mobile */}
-            <div
-              className={[
-                "hidden lg:block",
-                "bg-white rounded-2xl border border-gray-200 shadow-sm",
-                "px-6 py-4 mb-4",
-              ].join(" ")}
-            >
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => router.push("/")}
-                  aria-label="חזרה לרשימה"
-                  className={[
-                    "w-11 h-11 flex items-center justify-center rounded-full",
-                    "text-gray-500 hover:text-gray-800 hover:bg-gray-100",
-                    "transition-colors duration-150",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
-                    "flex-shrink-0",
-                  ].join(" ")}
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
+            <div className="hidden lg:block rounded-2xl overflow-hidden shadow-sm mb-4">
+              <div className="px-6 py-4" style={{ backgroundColor: "#09090f" }}>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => router.push("/")}
+                    aria-label="חזרה לרשימה"
+                    className="w-11 h-11 flex items-center justify-center rounded-full flex-shrink-0 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                    style={{ color: "rgba(255,255,255,0.6)" }}
                   >
-                    <polyline points="9 18 15 12 9 6" />
-                  </svg>
-                </button>
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </button>
 
-                <div className="flex-1 min-w-0">
-                  <h1 className="text-[17px] font-bold text-gray-900 leading-snug truncate">
-                    {patientName}
-                  </h1>
-                  {assessmentDate && (
-                    <p className="text-sm text-gray-500 leading-tight mt-0.5">
-                      {assessmentDate}
-                    </p>
-                  )}
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-[17px] font-bold text-white leading-snug truncate">
+                      {patientName}
+                    </h1>
+                    {assessmentDate && (
+                      <p className="text-sm leading-tight mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
+                        {assessmentDate}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Block tab bar — desktop */}
-              <div className="mt-3 -mx-6 border-t border-gray-100">
-                <BlockTabBar
-                  activeBlock={activeBlock}
-                  completedBlocks={completedBlocks}
-                  onSelectBlock={setActiveBlock}
-                />
-              </div>
+              <BlockTabBar
+                activeBlock={activeBlock}
+                completedBlocks={completedBlocks}
+                onSelectBlock={setActiveBlock}
+              />
             </div>
 
             {/* Block content area */}
@@ -334,14 +312,8 @@ export default function AssessmentPage() {
                   type="button"
                   onClick={handleFinish}
                   aria-describedby="block-content"
-                  className={[
-                    "w-full rounded-xl bg-blue-600 text-white",
-                    "py-3 px-6",
-                    "text-[17px] font-semibold",
-                    "min-h-[52px]",
-                    "hover:bg-blue-700 active:scale-[0.99] transition-all duration-150",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
-                  ].join(" ")}
+                  className="w-full rounded-xl text-white py-3 px-6 text-[17px] font-semibold min-h-[52px] active:scale-[0.99] transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2"
+                  style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}
                 >
                   סיום
                 </button>
@@ -354,14 +326,8 @@ export default function AssessmentPage() {
                 type="button"
                 onClick={handleFinish}
                 aria-describedby="block-content"
-                className={[
-                  "w-full rounded-xl bg-blue-600 text-white",
-                  "py-3 px-6",
-                  "text-[17px] font-semibold",
-                  "min-h-[52px]",
-                  "hover:bg-blue-700 active:scale-[0.99] transition-all duration-150",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
-                ].join(" ")}
+                className="w-full rounded-xl text-white py-3 px-6 text-[17px] font-semibold min-h-[52px] active:scale-[0.99] transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2"
+                style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}
               >
                 סיום
               </button>

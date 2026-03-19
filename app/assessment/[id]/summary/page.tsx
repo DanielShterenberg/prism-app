@@ -399,13 +399,8 @@ export default function SummaryPage() {
         <button
           type="button"
           onClick={() => router.push("/")}
-          className={[
-            "rounded-xl bg-blue-600 text-white px-6 py-3",
-            "text-[17px] font-medium",
-            "hover:bg-blue-700 active:scale-[0.98] transition-all duration-150",
-            "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
-            "min-h-[48px]",
-          ].join(" ")}
+          className="rounded-xl text-white px-6 py-3 text-[17px] font-medium active:scale-[0.98] transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 min-h-[48px]"
+          style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}
         >
           חזרה לרשימה
         </button>
@@ -439,7 +434,7 @@ export default function SummaryPage() {
           "text-[17px] font-medium",
           "min-h-[52px]",
           "hover:bg-gray-50 active:scale-[0.99] transition-all duration-150",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2",
         ].join(" ")}
       >
         עריכה
@@ -488,16 +483,10 @@ export default function SummaryPage() {
         onClick={handleMarkCompleted}
         disabled={isCompleted || isCompleting}
         aria-disabled={isCompleted || isCompleting}
-        className={[
-          "flex-1 rounded-xl text-white",
-          "py-3 px-4",
-          "text-[17px] font-semibold",
-          "min-h-[52px]",
-          isCompleted || isCompleting
-            ? "bg-green-400 cursor-default"
-            : "bg-blue-600 hover:bg-blue-700 active:scale-[0.99] transition-all duration-150",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
-        ].join(" ")}
+        className="flex-1 rounded-xl text-white py-3 px-4 text-[17px] font-semibold min-h-[52px] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 disabled:opacity-70"
+        style={isCompleted || isCompleting
+          ? { background: "#34d399" }
+          : { background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}
       >
         {isCompleted ? "הושלם" : "סמן כהושלם"}
       </button>
@@ -514,8 +503,9 @@ export default function SummaryPage() {
         {/* Mobile header — hidden on desktop                                */}
         {/* ---------------------------------------------------------------- */}
         <header
-          className="lg:hidden sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm"
+          className="lg:hidden sticky top-0 z-10"
           aria-label="כותרת סיכום הערכה"
+          style={{ backgroundColor: "#09090f" }}
         >
           <div className="px-4 py-4">
             <div className="flex items-center gap-3">
@@ -524,13 +514,8 @@ export default function SummaryPage() {
                 type="button"
                 onClick={handleEdit}
                 aria-label="חזרה לטופס"
-                className={[
-                  "w-11 h-11 flex items-center justify-center rounded-full",
-                  "text-gray-500 hover:text-gray-800 hover:bg-gray-100",
-                  "transition-colors duration-150",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
-                  "flex-shrink-0",
-                ].join(" ")}
+                className="w-11 h-11 flex items-center justify-center rounded-full flex-shrink-0 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                style={{ color: "rgba(255,255,255,0.6)" }}
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -547,24 +532,18 @@ export default function SummaryPage() {
               </button>
 
               <div className="flex-1 min-w-0">
-                <h1 className="text-[17px] font-bold text-gray-900 leading-snug truncate">
+                <h1 className="text-[17px] font-bold text-white leading-snug truncate">
                   {patientName}
                 </h1>
-                <p className="text-sm text-gray-500 leading-tight mt-0.5">
+                <p className="text-sm leading-tight mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
                   {assessmentDate ? `${assessmentDate} · ` : ""}
-                  סיכום ערכה
+                  סיכום הערכה
                 </p>
               </div>
 
               {/* Completed badge */}
               {isCompleted && (
-                <span
-                  className={[
-                    "flex-shrink-0 inline-flex items-center gap-1",
-                    "rounded-full bg-green-100 text-green-700",
-                    "px-3 py-1 text-[13px] font-medium",
-                  ].join(" ")}
-                >
+                <span className="flex-shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1 text-[13px] font-medium" style={{ background: "rgba(52,211,153,0.15)", color: "#34d399" }}>
                   <svg
                     aria-hidden="true"
                     viewBox="0 0 12 12"
@@ -612,74 +591,59 @@ export default function SummaryPage() {
           {/* ============================================================== */}
           <div className="flex-1 min-w-0 lg:pe-4 flex flex-col">
             {/* Desktop header — hidden on mobile */}
-            <div
-              className={[
-                "hidden lg:block",
-                "bg-white rounded-2xl border border-gray-200 shadow-sm",
-                "px-6 py-4 mb-4",
-              ].join(" ")}
-            >
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={handleEdit}
-                  aria-label="חזרה לטופס"
-                  className={[
-                    "w-11 h-11 flex items-center justify-center rounded-full",
-                    "text-gray-500 hover:text-gray-800 hover:bg-gray-100",
-                    "transition-colors duration-150",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
-                    "flex-shrink-0",
-                  ].join(" ")}
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <polyline points="9 18 15 12 9 6" />
-                  </svg>
-                </button>
-
-                <div className="flex-1 min-w-0">
-                  <h1 className="text-[17px] font-bold text-gray-900 leading-snug truncate">
-                    {patientName}
-                  </h1>
-                  <p className="text-sm text-gray-500 leading-tight mt-0.5">
-                    {assessmentDate ? `${assessmentDate} · ` : ""}
-                    סיכום ערכה
-                  </p>
-                </div>
-
-                {/* Completed badge */}
-                {isCompleted && (
-                  <span
-                    className={[
-                      "flex-shrink-0 inline-flex items-center gap-1",
-                      "rounded-full bg-green-100 text-green-700",
-                      "px-3 py-1 text-[13px] font-medium",
-                    ].join(" ")}
+            <div className="hidden lg:block rounded-2xl overflow-hidden shadow-sm mb-4">
+              <div className="px-6 py-4" style={{ backgroundColor: "#09090f" }}>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleEdit}
+                    aria-label="חזרה לטופס"
+                    className="w-11 h-11 flex items-center justify-center rounded-full flex-shrink-0 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                    style={{ color: "rgba(255,255,255,0.6)" }}
                   >
                     <svg
-                      aria-hidden="true"
-                      viewBox="0 0 12 12"
-                      className="w-3 h-3"
+                      viewBox="0 0 24 24"
+                      className="w-5 h-5"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth={2}
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      aria-hidden="true"
                     >
-                      <polyline points="1.5,6 4.5,9 10.5,3" />
+                      <polyline points="9 18 15 12 9 6" />
                     </svg>
-                    הושלם
-                  </span>
-                )}
+                  </button>
+
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-[17px] font-bold text-white leading-snug truncate">
+                      {patientName}
+                    </h1>
+                    <p className="text-sm leading-tight mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
+                      {assessmentDate ? `${assessmentDate} · ` : ""}
+                      סיכום הערכה
+                    </p>
+                  </div>
+
+                  {/* Completed badge */}
+                  {isCompleted && (
+                    <span className="flex-shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1 text-[13px] font-medium" style={{ background: "rgba(52,211,153,0.15)", color: "#34d399" }}>
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 12 12"
+                        className="w-3 h-3"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="1.5,6 4.5,9 10.5,3" />
+                      </svg>
+                      הושלם
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 

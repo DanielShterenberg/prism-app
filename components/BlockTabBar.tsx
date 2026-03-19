@@ -106,10 +106,10 @@ export function BlockTabBar({
                   "text-xs font-medium leading-tight",
                   // Active vs inactive colour
                   isActive
-                    ? "text-blue-600"
+                    ? "text-violet-600"
                     : "text-gray-500 hover:text-gray-800",
                   // Focus
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400",
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-400",
                   "transition-colors duration-150",
                 ].join(" ")}
               >
@@ -141,7 +141,7 @@ export function BlockTabBar({
                 {isActive && (
                   <span
                     aria-hidden="true"
-                    className="absolute bottom-0 inset-x-0 h-0.5 bg-blue-600 rounded-t"
+                    className="absolute bottom-0 inset-x-0 h-0.5 bg-violet-600 rounded-t"
                   />
                 )}
               </button>

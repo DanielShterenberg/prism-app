@@ -29,7 +29,7 @@ const STATUS_LABEL: Record<AssessmentStatus, string> = {
 };
 
 const STATUS_STYLE: Record<AssessmentStatus, string> = {
-  in_progress: "bg-blue-100 text-blue-800",
+  in_progress: "bg-violet-50 text-violet-700",
   completed: "bg-green-100 text-green-800",
 };
 
@@ -115,12 +115,12 @@ export function AssessmentSidebar({
                       "min-h-[56px]",
                       // Active vs inactive
                       isActive
-                        ? "bg-blue-50 text-blue-900"
+                        ? "bg-violet-50 text-violet-900"
                         : "text-gray-700 hover:bg-gray-50",
                       // Interaction
                       "transition-colors duration-150",
                       // Focus
-                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
+                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400",
                     ].join(" ")}
                   >
                     <span className="text-[14px] font-medium leading-snug truncate block">
@@ -158,14 +158,15 @@ export function AssessmentSidebar({
             type="button"
             onClick={onNewAssessment}
             aria-label="הערכה חדשה"
+            style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}
             className={[
-              "w-full rounded-xl bg-blue-600 text-white",
+              "w-full rounded-xl text-white",
               "py-2.5 px-4",
               "text-[15px] font-semibold",
               "min-h-[44px]",
               "flex items-center justify-center gap-2",
-              "hover:bg-blue-700 active:scale-[0.99] transition-all duration-150",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
+              "active:scale-[0.99] transition-all duration-150",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2",
             ].join(" ")}
           >
             <span aria-hidden="true" className="text-lg leading-none">
