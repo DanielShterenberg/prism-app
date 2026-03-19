@@ -29,8 +29,8 @@ export default function LoginPage() {
           router.replace("/");
         }
       })
-      .catch(() => {
-        setError("הכניסה עם Google נכשלה, נסה שנית");
+      .catch((err) => {
+        setError(err?.code ?? err?.message ?? "unknown error");
       })
       .finally(() => {
         setGoogleLoading(false);
@@ -56,8 +56,9 @@ export default function LoginPage() {
     setGoogleLoading(true);
     try {
       await signInWithRedirect(getClientAuth(), googleProvider);
-    } catch {
-      setError("הכניסה עם Google נכשלה, נסה שנית");
+    } catch (err: unknown) {
+      const e = err as { code?: string; message?: string };
+      setError(e?.code ?? e?.message ?? "unknown error");
       setGoogleLoading(false);
     }
   }
