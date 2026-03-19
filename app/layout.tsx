@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Rubik } from "next/font/google";
 import { AuthProvider } from "@/components/AuthProvider";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+const rubik = Rubik({
+  variable: "--font-rubik",
+  subsets: ["latin", "hebrew"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -14,11 +15,6 @@ export const metadata: Metadata = {
   description: "ASD Assessment Tool",
 };
 
-/**
- * Viewport configuration for iPad Safari optimization:
- * - maximum-scale=1 prevents auto-zoom on input focus (paired with font-size ≥ 16px)
- * - viewport-fit=cover enables env(safe-area-inset-*) for notch/home-bar on modern iPads
- */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -33,9 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="he" dir="rtl">
-      <body className={`${inter.variable} antialiased`}>
-          <AuthProvider>{children}</AuthProvider>
-        </body>
+      <body className={`${rubik.variable} antialiased`}>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

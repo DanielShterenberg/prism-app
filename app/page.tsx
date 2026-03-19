@@ -35,60 +35,64 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 pb-28">
-      {/* ------------------------------------------------------------------ */}
-      {/* Header                                                               */}
-      {/* ------------------------------------------------------------------ */}
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 lg:px-8 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">הערכות</h1>
+    <main className="min-h-screen pb-28" style={{ backgroundColor: "#f4f4f8" }}>
+      {/* Dark header band */}
+      <div style={{ backgroundColor: "#09090f" }}>
+        <header className="sticky top-0 z-10" style={{ backgroundColor: "#09090f" }}>
+          <div className="max-w-4xl mx-auto px-4 lg:px-8 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}
+              >
+                <span className="text-white font-bold text-xs">P</span>
+              </div>
+              <span className="text-white font-semibold text-[17px] tracking-tight">Prism</span>
+            </div>
+            {syncing && (
+              <span role="status" aria-label="מסנכרן עם הענן"
+                className="text-xs animate-pulse"
+                style={{ color: "rgba(255,255,255,0.35)" }}>
+                מסנכרן...
+              </span>
+            )}
+          </div>
+        </header>
 
-          {/* Cloud sync spinner — visible only while background sync runs */}
-          {syncing && (
-            <span
-              role="status"
-              aria-label="מסנכרן עם הענן"
-              className="text-xs text-gray-400 animate-pulse"
-            >
-              מסנכרן...
-            </span>
-          )}
+        {/* Hero section inside dark band */}
+        <div className="max-w-4xl mx-auto px-4 lg:px-8 pt-2 pb-12">
+          <h1 className="text-3xl font-bold text-white tracking-tight">הערכות</h1>
+          <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
+            רשימת המטופלים שלך
+          </p>
         </div>
-      </header>
+      </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Content                                                              */}
-      {/* ------------------------------------------------------------------ */}
+      {/* Cards pulled up over dark band */}
       <section
-        className="max-w-4xl mx-auto px-4 lg:px-8 pt-6"
+        className="max-w-4xl mx-auto px-4 lg:px-8 -mt-6"
         aria-label="רשימת הערכות"
       >
         {loading ? (
-          /* Skeleton — only shown during the initial localStorage read (usually <1 frame) */
-          <div
-            role="status"
-            aria-label="טוען הערכות"
-            className="flex flex-col gap-3"
-          >
+          <div role="status" aria-label="טוען הערכות" className="flex flex-col gap-3">
             {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-20 rounded-2xl bg-gray-200 animate-pulse"
-              />
+              <div key={i} className="h-[88px] rounded-xl bg-white/60 animate-pulse" />
             ))}
           </div>
         ) : assessments.length === 0 ? (
-          /* Empty state */
-          <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-            <p className="text-gray-500 text-lg leading-relaxed">
+          <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-2"
+              style={{ background: "rgba(124,58,237,0.08)" }}>
+              <span className="text-2xl" style={{ color: "#7c3aed" }}>+</span>
+            </div>
+            <p className="text-gray-500 text-base leading-relaxed">
               עדיין אין הערכות.
               <br />
-              לחץ על + כדי להתחיל.
+              <span className="text-sm text-gray-400">לחץ על + כדי להתחיל</span>
             </p>
           </div>
         ) : (
-          /* Assessment card list */
-          <ul className="flex flex-col gap-3" role="list">
+          <ul className="flex flex-col gap-2.5" role="list">
             {assessments.map((a) => (
               <li key={a.id}>
                 <AssessmentCard assessment={a} onClick={handleCardClick} />
@@ -98,29 +102,16 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* FAB — New Assessment                                                 */}
-      {/* ------------------------------------------------------------------ */}
-      {/* RTL: fixed to bottom-left visually = bottom-right in physical coords */}
+      {/* FAB */}
       <button
         type="button"
         onClick={handleNewAssessment}
         aria-label="הערכה חדשה — לחץ ליצירת הערכה חדשה"
-        className={[
-          // Position — bottom-left in RTL (start = right side of screen in LTR, left in RTL)
-          "fixed bottom-6 start-6",
-          // Size — 56 px: well above 44 px minimum touch target
-          "w-14 h-14 rounded-full",
-          // Appearance
-          "bg-blue-600 text-white shadow-lg",
-          "flex items-center justify-center",
-          // Typography
-          "text-3xl font-light leading-none",
-          // Interaction
-          "hover:bg-blue-700 active:scale-95 transition-all duration-150",
-          // Focus
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
-        ].join(" ")}
+        className="fixed bottom-6 start-6 w-14 h-14 rounded-full flex items-center justify-center text-3xl font-light text-white leading-none active:scale-95 transition-all duration-150 focus:outline-none"
+        style={{
+          background: "linear-gradient(135deg, #7c3aed, #4f46e5)",
+          boxShadow: "0 8px 24px rgba(124,58,237,0.4)",
+        }}
       >
         +
       </button>

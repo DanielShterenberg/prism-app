@@ -26,18 +26,18 @@
   --foreground-muted:  #64748b;
   --foreground-subtle: #94a3b8;
 
-  /* Primary navy */
-  --primary:           #1E3A5F;
-  --primary-hover:     #16304f;
-  --primary-active:    #0e2340;
-  --primary-light:     #e8eef5;
+  /* Primary obsidian */
+  --primary:           #09090f;
+  --primary-hover:     #141420;
+  --primary-active:    #1e1e2e;
+  --primary-light:     #f0f0ff;
   --primary-foreground: #ffffff;
 
-  /* Accent teal */
-  --accent:            #0D9488;
-  --accent-hover:      #0b7a6f;
-  --accent-active:     #096158;
-  --accent-light:      #e0f5f3;
+  /* Accent violet */
+  --accent:            #7c3aed;
+  --accent-hover:      #6d28d9;
+  --accent-active:     #5b21b6;
+  --accent-light:      #ede9fe;
   --accent-foreground: #ffffff;
 
   /* Semantic */
@@ -152,8 +152,7 @@
   --color-border-strong:     var(--border-strong);
 
   /* Typography */
-  --font-sans: "Inter", "Arial", system-ui, -apple-system, "Segoe UI",
-    "Noto Sans Hebrew", "Arial Hebrew", sans-serif;
+  --font-sans: "Rubik", "Arial Hebrew", system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", "Consolas", monospace;
 
   /* Type scale: 12 / 14 / 16 / 20 / 24 / 32 px */

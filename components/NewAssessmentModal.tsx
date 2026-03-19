@@ -137,139 +137,146 @@ export default function NewAssessmentModal({ onClose }: NewAssessmentModalProps)
       role="dialog"
       aria-modal="true"
       aria-labelledby="new-assessment-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
       onClick={(e) => {
-        // Close when clicking the backdrop (not the modal itself)
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      {/* Semi-transparent overlay */}
-      <div
-        className="absolute inset-0 bg-black/40"
-        aria-hidden="true"
-      />
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
 
       {/* Modal panel */}
-      <div className="relative z-10 w-full max-w-md rounded-2xl bg-white shadow-xl p-6 flex flex-col gap-5">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h2
-            id="new-assessment-title"
-            className="text-lg font-bold text-gray-900"
-          >
-            הערכה חדשה
-          </h2>
+      <div
+        className="relative z-10 w-full sm:max-w-[420px] sm:mx-4 flex flex-col"
+        style={{ borderRadius: "20px 20px 0 0" }}
+      >
+        {/* Dark header strip */}
+        <div
+          className="rounded-t-[20px] px-6 pt-6 pb-5 flex items-center justify-between"
+          style={{ backgroundColor: "#09090f" }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}
+            >
+              <span className="text-white font-bold text-xs">+</span>
+            </div>
+            <h2
+              id="new-assessment-title"
+              className="text-white font-semibold text-[17px] tracking-tight"
+            >
+              הערכה חדשה
+            </h2>
+          </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="סגור"
-            className={[
-              "w-11 h-11 flex items-center justify-center rounded-full",
-              "text-gray-400 hover:text-gray-700 hover:bg-gray-100",
-              "transition-colors duration-150",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
-            ].join(" ")}
+            className="w-8 h-8 flex items-center justify-center rounded-full transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+            style={{ color: "rgba(255,255,255,0.4)" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(255,255,255,0.08)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.9)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.4)"; }}
           >
             ✕
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-          {/* Patient name */}
-          <div className="flex flex-col gap-1">
-            <label
-              htmlFor="patient-name"
-              className="text-sm font-medium text-gray-700"
-            >
-              שם המטופל/ת
-              <span aria-hidden="true" className="text-red-500 ms-0.5">
-                {" "}*
-              </span>
-            </label>
-            <input
-              ref={nameInputRef}
-              id="patient-name"
-              type="text"
-              value={patientName}
-              onChange={(e) => {
-                setPatientName(e.target.value);
-                if (nameError) setNameError(false);
-              }}
-              placeholder="הכנס שם"
-              autoComplete="off"
-              required
-              aria-required="true"
-              aria-invalid={nameError}
-              aria-describedby={nameError ? "patient-name-error" : undefined}
-              className={[
-                "w-full rounded-xl border px-4 py-3",
-                // Font ≥ 16pt prevents iPad Safari auto-zoom
-                "text-[17px] leading-snug text-gray-900",
-                "placeholder:text-gray-400",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
-                "transition-colors duration-150",
-                nameError
-                  ? "border-red-400 bg-red-50"
-                  : "border-gray-300 bg-white",
-              ].join(" ")}
-            />
-            {nameError && (
-              <p
-                id="patient-name-error"
-                role="alert"
-                className="text-sm text-red-600"
-              >
-                יש להזין שם מטופל/ת
-              </p>
-            )}
-          </div>
+        {/* Form body */}
+        <div className="bg-white px-6 pt-5 pb-6 rounded-b-none sm:rounded-b-[20px]">
+          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+            {/* Patient name */}
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="patient-name" className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                שם המטופל
+                <span aria-hidden="true" className="ms-0.5" style={{ color: "#7c3aed" }}>*</span>
+              </label>
+              <input
+                ref={nameInputRef}
+                id="patient-name"
+                type="text"
+                value={patientName}
+                onChange={(e) => {
+                  setPatientName(e.target.value);
+                  if (nameError) setNameError(false);
+                }}
+                placeholder="הכנס שם מלא"
+                autoComplete="off"
+                required
+                aria-required="true"
+                aria-invalid={nameError}
+                aria-describedby={nameError ? "patient-name-error" : undefined}
+                className="w-full rounded-xl px-4 py-3 text-[17px] leading-snug text-gray-900 placeholder:text-gray-300 transition-all duration-150 focus:outline-none"
+                style={{
+                  border: nameError ? "1.5px solid #f87171" : "1.5px solid #e8e8f0",
+                  backgroundColor: nameError ? "#fff5f5" : "#fafafa",
+                  ...(nameError ? {} : {}),
+                }}
+                onFocus={(e) => {
+                  if (!nameError) {
+                    e.currentTarget.style.border = "1.5px solid #7c3aed";
+                    e.currentTarget.style.backgroundColor = "#fff";
+                  }
+                }}
+                onBlur={(e) => {
+                  if (!nameError) {
+                    e.currentTarget.style.border = "1.5px solid #e8e8f0";
+                    e.currentTarget.style.backgroundColor = "#fafafa";
+                  }
+                }}
+              />
+              {nameError && (
+                <p id="patient-name-error" role="alert" className="text-xs text-red-500 mt-0.5">
+                  יש להזין שם מטופל
+                </p>
+              )}
+            </div>
 
-          {/* Assessment date */}
-          <div className="flex flex-col gap-1">
-            <label
-              htmlFor="assessment-date"
-              className="text-sm font-medium text-gray-700"
-            >
-              תאריך הערכה
-            </label>
-            <input
-              id="assessment-date"
-              type="date"
-              value={assessmentDateISO}
-              onChange={(e) => setAssessmentDateISO(e.target.value)}
-              className={[
-                "w-full rounded-xl border border-gray-300 bg-white px-4 py-3",
-                // Font ≥ 16pt prevents iPad Safari auto-zoom
-                "text-[17px] leading-snug text-gray-900",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
-                "transition-colors duration-150",
-              ].join(" ")}
-            />
-            {assessmentDateISO && (
-              <p className="text-xs text-gray-400 mt-0.5">
-                {isoToDDMMYYYY(assessmentDateISO)}
-              </p>
-            )}
-          </div>
+            {/* Assessment date */}
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="assessment-date" className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                תאריך הערכה
+              </label>
+              <input
+                id="assessment-date"
+                type="date"
+                value={assessmentDateISO}
+                onChange={(e) => setAssessmentDateISO(e.target.value)}
+                className="w-full rounded-xl px-4 py-3 text-[17px] leading-snug text-gray-900 transition-all duration-150 focus:outline-none"
+                style={{
+                  border: "1.5px solid #e8e8f0",
+                  backgroundColor: "#fafafa",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.border = "1.5px solid #7c3aed";
+                  e.currentTarget.style.backgroundColor = "#fff";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.border = "1.5px solid #e8e8f0";
+                  e.currentTarget.style.backgroundColor = "#fafafa";
+                }}
+              />
+              {assessmentDateISO && (
+                <p className="text-xs mt-0.5" style={{ color: "#a0a0b0" }}>
+                  {isoToDDMMYYYY(assessmentDateISO)}
+                </p>
+              )}
+            </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={submitting}
-            className={[
-              "mt-1 w-full rounded-xl py-3 px-6",
-              "text-[17px] font-semibold text-white",
-              // Touch target height: py-3 + text = ~52px, well above 44px
-              "bg-blue-600 hover:bg-blue-700 active:scale-[0.98]",
-              "transition-all duration-150",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
-              "disabled:opacity-60 disabled:cursor-not-allowed",
-            ].join(" ")}
-          >
-            {submitting ? "פותח..." : "התחל הערכה"}
-          </button>
-        </form>
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mt-1 w-full rounded-xl py-3.5 px-6 text-[17px] font-semibold text-white active:scale-[0.98] transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}
+            >
+              {submitting ? "פותח..." : "התחל הערכה ←"}
+            </button>
+          </form>
+        </div>
+
+        {/* iPhone home bar spacer */}
+        <div className="bg-white h-safe-bottom sm:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }} />
       </div>
     </div>
   );
