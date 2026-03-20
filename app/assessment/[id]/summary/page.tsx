@@ -317,7 +317,10 @@ function buildBlockSummaries(assessment: Assessment): BlockSummary[] {
  */
 function BlockSection({ block }: { block: BlockSummary }) {
   return (
-    <section aria-labelledby={`summary-block-${block.id}`}>
+    <section
+      aria-labelledby={`summary-block-${block.id}`}
+      className="print:break-inside-avoid"
+    >
       <h2
         id={`summary-block-${block.id}`}
         className="text-[15px] font-semibold text-gray-500 uppercase tracking-wide mb-3"
@@ -441,39 +444,24 @@ export default function SummaryPage() {
       </button>
 
       {/* ------------------------------------------------------------------ */}
-      {/* Export / Share button — disabled in v1                               */}
+      {/* Export button — triggers browser print dialog                       */}
       {/* ------------------------------------------------------------------ */}
-      <div className="relative flex-shrink-0 group">
-        <button
-          type="button"
-          disabled
-          aria-disabled="true"
-          aria-label="ייצוא / שיתוף — בקרוב בגרסה 2"
-          className={[
-            "rounded-xl border border-gray-200 bg-gray-100 text-gray-400",
-            "py-3 px-4",
-            "text-[17px] font-medium",
-            "min-h-[52px]",
-            "cursor-not-allowed",
-            "focus:outline-none",
-          ].join(" ")}
-        >
-          ייצוא
-        </button>
-        {/* Tooltip */}
-        <div
-          role="tooltip"
-          className={[
-            "absolute bottom-full mb-2 right-0",
-            "px-3 py-1.5 rounded-lg",
-            "bg-gray-800 text-white text-[13px] whitespace-nowrap",
-            "opacity-0 group-hover:opacity-100 pointer-events-none",
-            "transition-opacity duration-150",
-          ].join(" ")}
-        >
-          בקרוב בגרסה 2
-        </div>
-      </div>
+      <button
+        type="button"
+        onClick={() => window.print()}
+        aria-label="ייצוא ל-PDF"
+        className={[
+          "flex-shrink-0 rounded-xl border border-gray-300 bg-white text-gray-700",
+          "py-3 px-4",
+          "text-[17px] font-medium",
+          "min-h-[52px]",
+          "hover:bg-gray-50 active:scale-[0.99] transition-all duration-150",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2",
+          "print:hidden",
+        ].join(" ")}
+      >
+        ייצוא
+      </button>
 
       {/* ------------------------------------------------------------------ */}
       {/* Mark as Completed button                                             */}
@@ -503,7 +491,7 @@ export default function SummaryPage() {
         {/* Mobile header — hidden on desktop                                */}
         {/* ---------------------------------------------------------------- */}
         <header
-          className="lg:hidden sticky top-0 z-10"
+          className="lg:hidden print:hidden sticky top-0 z-10"
           aria-label="כותרת סיכום הערכה"
           style={{ backgroundColor: "#09090f" }}
         >
@@ -572,7 +560,7 @@ export default function SummaryPage() {
           {/* ============================================================== */}
           <div
             className={[
-              "hidden lg:flex lg:flex-col",
+              "hidden lg:flex lg:flex-col print:hidden",
               "lg:w-64 xl:w-72",
               "lg:sticky lg:top-6",
               "lg:max-h-[calc(100vh-3rem)]",
@@ -591,7 +579,7 @@ export default function SummaryPage() {
           {/* ============================================================== */}
           <div className="flex-1 min-w-0 lg:pe-4 flex flex-col">
             {/* Desktop header — hidden on mobile */}
-            <div className="hidden lg:block rounded-2xl overflow-hidden shadow-sm mb-4">
+            <div className="hidden lg:block print:hidden rounded-2xl overflow-hidden shadow-sm mb-4">
               <div className="px-6 py-4" style={{ backgroundColor: "#09090f" }}>
                 <div className="flex items-center gap-3">
                   <button
@@ -647,10 +635,23 @@ export default function SummaryPage() {
               </div>
             </div>
 
+            {/* Print-only header — shows patient name and assessment date at the top of the PDF */}
+            <div className="hidden print:block mb-6" aria-hidden="true">
+              <h1 className="text-[22px] font-bold text-gray-900 leading-snug">
+                {patientName}
+              </h1>
+              {assessmentDate && (
+                <p className="text-[15px] text-gray-500 mt-1">
+                  תאריך הערכה: {assessmentDate}
+                </p>
+              )}
+              <div className="mt-3 border-b border-gray-300" />
+            </div>
+
             {/* Summary content */}
             <main
               id="summary-content"
-              className="flex-1 px-4 lg:px-0 py-6 lg:py-0 pb-48 lg:pb-6"
+              className="flex-1 px-4 lg:px-0 py-6 lg:py-0 pb-48 lg:pb-6 print:pb-0 print:px-0"
               aria-label="תוכן סיכום ערכה"
             >
               {blockSummaries.length === 0 ? (
@@ -674,14 +675,14 @@ export default function SummaryPage() {
             {/* ------------------------------------------------------------ */}
 
             {/* Mobile action bar */}
-            <div className="lg:hidden fixed bottom-0 inset-x-0 z-10 bg-white border-t border-gray-200 shadow-lg safe-bottom">
+            <div className="lg:hidden print:hidden fixed bottom-0 inset-x-0 z-10 bg-white border-t border-gray-200 shadow-lg safe-bottom">
               <div className="px-4 pt-4">
                 {actionButtonsJsx}
               </div>
             </div>
 
             {/* Desktop action bar — inline */}
-            <div className="hidden lg:block px-0 pb-6">
+            <div className="hidden lg:block print:hidden px-0 pb-6">
               <div className="bg-white rounded-2xl border border-gray-200 shadow-sm px-4 py-4">
                 {actionButtonsJsx}
               </div>

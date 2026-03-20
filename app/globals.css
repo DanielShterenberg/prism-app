@@ -231,3 +231,94 @@ select {
 .scrollbar-none::-webkit-scrollbar {
   display: none; /* Chrome / Safari / Opera */
 }
+
+/* --------------------------------------------------------------------------
+   6. Print styles — PDF export via window.print()
+   -------------------------------------------------------------------------- */
+
+/**
+ * Print stylesheet for the assessment summary page.
+ * Called via window.print() from the "ייצוא" button on the summary screen.
+ *
+ * Goals:
+ *   - Chrome elements hidden via Tailwind's print:hidden utility on the JSX
+ *   - Preserve Hebrew RTL layout and Rubik / Arial Hebrew typography
+ *   - Clean white background, black text, A4-friendly margins
+ *   - Prevent page breaks inside individual block section cards
+ */
+@media print {
+  /* ---- Global page setup ---- */
+  @page {
+    size: A4 portrait;
+    margin: 20mm 15mm 20mm 15mm;
+  }
+
+  html,
+  body {
+    direction: rtl;
+    font-family: "Rubik", "Arial Hebrew", Arial, sans-serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #111111;
+    background: #ffffff;
+  }
+
+  /* Remove screen-only constraints from layout wrappers */
+  .min-h-screen {
+    min-height: unset !important;
+  }
+
+  /* ---- Block section cards — prevent mid-card page breaks ---- */
+  #summary-content section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 14pt;
+  }
+
+  /* Block heading */
+  #summary-content h2 {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #555555;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 5pt;
+  }
+
+  /* Card container */
+  #summary-content .rounded-2xl {
+    border: 1px solid #dddddd !important;
+    border-radius: 4pt !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+
+  /* Individual field rows */
+  #summary-content .px-5 {
+    padding-inline-start: 10pt !important;
+    padding-inline-end: 10pt !important;
+  }
+
+  /* Field label */
+  #summary-content p.text-gray-500 {
+    font-size: 8pt;
+    color: #777777 !important;
+    margin-bottom: 2pt;
+  }
+
+  /* Field value */
+  #summary-content p.text-gray-900 {
+    font-size: 11pt;
+    color: #111111 !important;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+
+  /* Print-only header typography */
+  #summary-content ~ * h1,
+  .print\:block h1 {
+    font-size: 18pt;
+    font-weight: 700;
+    color: #111111;
+  }
+}
