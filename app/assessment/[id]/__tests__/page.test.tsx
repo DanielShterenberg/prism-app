@@ -42,6 +42,21 @@ jest.mock("@/hooks/useAssessments", () => ({
   }),
 }));
 
+// useSync triggers network calls — stub it out.
+jest.mock("@/hooks/useSync", () => ({
+  useSync: jest.fn(),
+}));
+
+// EditAssessmentModal — stub with a simple dialog so we can test open/close.
+jest.mock("@/components/EditAssessmentModal", () => ({
+  __esModule: true,
+  default: ({ onClose }: { onClose: () => void }) => (
+    <div role="dialog" aria-label="edit-modal-stub">
+      <button type="button" onClick={onClose}>סגור מודל</button>
+    </div>
+  ),
+}));
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -206,5 +221,36 @@ describe("AssessmentPage", () => {
     const btns = screen.getAllByRole("button", { name: "חזרה לרשימה" });
     fireEvent.click(btns[0]);
     expect(mockPush).toHaveBeenCalledWith("/");
+  });
+
+  it("renders the edit button in the header", () => {
+    mockFound(makeAssessment());
+    render(<AssessmentPage />);
+    const editBtns = screen.getAllByRole("button", { name: "עריכת פרטי הערכה" });
+    expect(editBtns.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("opens the edit modal when the edit button is clicked", () => {
+    mockFound(makeAssessment());
+    render(<AssessmentPage />);
+    // Initially, the edit modal is not visible
+    expect(screen.queryByRole("dialog", { name: "edit-modal-stub" })).not.toBeInTheDocument();
+
+    const editBtns = screen.getAllByRole("button", { name: "עריכת פרטי הערכה" });
+    fireEvent.click(editBtns[0]);
+
+    expect(screen.getByRole("dialog", { name: "edit-modal-stub" })).toBeInTheDocument();
+  });
+
+  it("closes the edit modal when its onClose is called", () => {
+    mockFound(makeAssessment());
+    render(<AssessmentPage />);
+
+    const editBtns = screen.getAllByRole("button", { name: "עריכת פרטי הערכה" });
+    fireEvent.click(editBtns[0]);
+    expect(screen.getByRole("dialog", { name: "edit-modal-stub" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "סגור מודל" }));
+    expect(screen.queryByRole("dialog", { name: "edit-modal-stub" })).not.toBeInTheDocument();
   });
 });

@@ -30,6 +30,7 @@ import BlockD from "@/components/BlockD";
 import BlockE from "@/components/BlockE";
 import AssessmentSidebar from "@/components/AssessmentSidebar";
 import NewAssessmentModal from "@/components/NewAssessmentModal";
+import EditAssessmentModal from "@/components/EditAssessmentModal";
 import type { Assessment } from "@/types/assessment";
 import type { BlockId } from "@/components/BlockTabBar";
 
@@ -78,6 +79,7 @@ export default function AssessmentPage() {
   const { assessment, notFound, refresh } = useAssessment(id);
   const [activeBlock, setActiveBlock] = useState<BlockId>("A");
   const [newAssessmentModalOpen, setNewAssessmentModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   // Snapshot passed to useSync — updated whenever a block saves.
   const [syncSnapshot, setSyncSnapshot] = useState<Assessment | null>(null);
@@ -105,6 +107,14 @@ export default function AssessmentPage() {
   function handleFinish() {
     router.push(`/assessment/${id}/summary`);
   }
+
+  const handleEditSave = useCallback(
+    (updated: Assessment) => {
+      setSyncSnapshot(updated);
+      refresh();
+    },
+    [refresh]
+  );
 
   // -------------------------------------------------------------------------
   // Not found state
@@ -185,6 +195,29 @@ export default function AssessmentPage() {
                   </p>
                 )}
               </div>
+
+              {/* Edit button */}
+              <button
+                type="button"
+                onClick={() => setEditModalOpen(true)}
+                aria-label="עריכת פרטי הערכה"
+                className="w-9 h-9 flex items-center justify-center rounded-full flex-shrink-0 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                style={{ color: "rgba(255,255,255,0.5)" }}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -264,6 +297,29 @@ export default function AssessmentPage() {
                       </p>
                     )}
                   </div>
+
+                  {/* Edit button */}
+                  <button
+                    type="button"
+                    onClick={() => setEditModalOpen(true)}
+                    aria-label="עריכת פרטי הערכה"
+                    className="w-9 h-9 flex items-center justify-center rounded-full flex-shrink-0 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                    style={{ color: "rgba(255,255,255,0.5)" }}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                  </button>
                 </div>
               </div>
 
@@ -339,6 +395,15 @@ export default function AssessmentPage() {
       {/* New Assessment Modal — triggered from desktop sidebar */}
       {newAssessmentModalOpen && (
         <NewAssessmentModal onClose={() => setNewAssessmentModalOpen(false)} />
+      )}
+
+      {/* Edit Assessment Modal — triggered by pencil icon in header */}
+      {editModalOpen && (
+        <EditAssessmentModal
+          assessment={assessment}
+          onSave={handleEditSave}
+          onClose={() => setEditModalOpen(false)}
+        />
       )}
     </>
   );
