@@ -5,7 +5,7 @@
  *  - Shows "הערכה לא נמצאה" when assessment is not found
  *  - "חזרה לרשימה" navigates to "/" when not found
  *  - Renders patient name and date in the header
- *  - Shows "סיכום ערכה" subtitle in header
+ *  - Shows "סיכום הערכה" subtitle in header
  *  - Skips empty blocks — only blocks with filled fields are rendered
  *  - Skips empty fields within a block
  *  - Renders Hebrew block titles (א–ה)
@@ -16,7 +16,7 @@
  *  - "סמן כהושלם" calls updateAssessment with status='completed' and syncStatus='pending'
  *  - "סמן כהושלם" button becomes "הושלם" when assessment.status is 'completed'
  *  - "סמן כהושלם" button is disabled when status is 'completed'
- *  - "ייצוא" button is disabled
+ *  - "ייצוא" button is enabled and calls window.print()
  *  - "הושלם" badge is shown when assessment.status is 'completed'
  */
 
@@ -144,11 +144,11 @@ describe("SummaryPage", () => {
       expect(headings.some((h) => h.textContent?.includes("ילד בדיקה"))).toBe(true);
     });
 
-    it("renders the 'סיכום ערכה' subtitle", () => {
+    it("renders the 'סיכום הערכה' subtitle", () => {
       mockFound(makeAssessment());
       render(<SummaryPage />);
       // Subtitle appears in both mobile and desktop headers
-      const subtitles = screen.getAllByText(/סיכום ערכה/);
+      const subtitles = screen.getAllByText(/סיכום הערכה/);
       expect(subtitles.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -348,23 +348,22 @@ describe("SummaryPage", () => {
       expect(mockPush).toHaveBeenCalledWith("/assessment/test-id-summary");
     });
 
-    it('"ייצוא" button is disabled', () => {
+    it('"ייצוא" button is enabled and calls window.print()', () => {
       mockFound(makeAssessment());
+      // Stub window.print so it does not throw in jsdom
+      const printMock = jest.fn();
+      Object.defineProperty(window, "print", { value: printMock, writable: true });
+
       render(<SummaryPage />);
-      // Two export buttons rendered (mobile + desktop) — both should be disabled
+
+      // Two export buttons rendered (mobile + desktop) — all should be enabled
       const exportBtns = screen.getAllByText("ייצוא").map((el) => el.closest("button"));
       expect(exportBtns.length).toBeGreaterThanOrEqual(1);
-      exportBtns.forEach((btn) => expect(btn).toBeDisabled());
-    });
+      exportBtns.forEach((btn) => expect(btn).not.toBeDisabled());
 
-    it('"ייצוא" button has aria-label mentioning "בקרוב בגרסה 2"', () => {
-      mockFound(makeAssessment());
-      render(<SummaryPage />);
-      // Two export buttons (mobile + desktop) — at least one should have the aria-label
-      const exportBtns = screen.getAllByRole("button", {
-        name: /בקרוב בגרסה 2/,
-      });
-      expect(exportBtns.length).toBeGreaterThanOrEqual(1);
+      // Clicking the first export button should trigger window.print()
+      fireEvent.click(exportBtns[0]!);
+      expect(printMock).toHaveBeenCalledTimes(1);
     });
 
     it('"סמן כהושלם" calls updateAssessment with status completed', () => {
