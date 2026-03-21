@@ -23,7 +23,7 @@ import PrismLogo from "@/components/PrismLogo";
 
 export default function HomePage() {
   const { token } = useAuth();
-  const { assessments, loading, syncing } = useAssessments(token ?? undefined);
+  const { assessments, loading, syncing, deleteAssessment } = useAssessments(token ?? undefined);
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -35,6 +35,20 @@ export default function HomePage() {
     router.push(`/assessment/${id}`);
   }
 
+  async function handleLogout() {
+    try {
+      const [{ signOut }, { getClientAuth }] = await Promise.all([
+        import("firebase/auth"),
+        import("@/lib/firebase"),
+      ]);
+      await signOut(getClientAuth());
+    } catch {
+      // ignore — clear cookie and redirect regardless
+    }
+    document.cookie = "prism-auth-token=; Max-Age=0; path=/";
+    router.push("/login");
+  }
+
   return (
     <main className="min-h-screen pb-28" style={{ backgroundColor: "#f4f4f8" }}>
       {/* Dark header band */}
@@ -42,13 +56,17 @@ export default function HomePage() {
         <header className="sticky top-0 z-10" style={{ backgroundColor: "#09090f" }}>
           <div className="max-w-4xl mx-auto px-4 lg:px-8 py-4 flex items-center justify-between">
             <PrismLogo />
-            {syncing && (
-              <span role="status" aria-label="מסנכרן עם הענן"
-                className="text-xs animate-pulse"
-                style={{ color: "rgba(255,255,255,0.35)" }}>
-                מסנכרן...
-              </span>
-            )}
+            <div className="flex items-center gap-3">
+              {syncing && (
+                <span role="status" aria-label="מסנכרן עם הענן"
+                  className="text-xs animate-pulse"
+                  style={{ color: "rgba(255,255,255,0.35)" }}>
+                  מסנכרן...
+                </span>
+              )}
+              {/* Logout button — person/exit icon, unobtrusive */}
+              <LogoutButton onLogout={handleLogout} />
+            </div>
           </div>
         </header>
 
@@ -88,7 +106,11 @@ export default function HomePage() {
           <ul className="flex flex-col gap-2.5" role="list">
             {assessments.map((a) => (
               <li key={a.id}>
-                <AssessmentCard assessment={a} onClick={handleCardClick} />
+                <AssessmentCard
+                  assessment={a}
+                  onClick={handleCardClick}
+                  onDelete={deleteAssessment}
+                />
               </li>
             ))}
           </ul>
@@ -121,5 +143,46 @@ export default function HomePage() {
       {/* ------------------------------------------------------------------ */}
       <OnboardingModal />
     </main>
+  );
+}
+
+/**
+ * Small logout icon button rendered inside the dark header.
+ * Uses a door/exit SVG — unobtrusive, sized to 44px touch target.
+ */
+function LogoutButton({ onLogout }: { onLogout: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onLogout}
+      aria-label="יציאה מהחשבון"
+      className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg
+                 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400
+                 transition-colors"
+      style={{ color: "rgba(255,255,255,0.45)" }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.85)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.45)";
+      }}
+    >
+      {/* Exit/door icon */}
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <polyline points="16 17 21 12 16 7" />
+        <line x1="21" y1="12" x2="9" y2="12" />
+      </svg>
+    </button>
   );
 }

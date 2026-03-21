@@ -17,6 +17,7 @@ import {
   listAssessments,
   updateAssessment,
   getAssessment,
+  deleteAssessment as localDeleteAssessment,
 } from "@/lib/localStorage";
 import type { Assessment } from "@/types/assessment";
 
@@ -31,6 +32,12 @@ export interface UseAssessmentsReturn {
   syncing: boolean;
   /** Reload both sources manually (e.g. after creating a new assessment). */
   refresh: () => void;
+  /**
+   * Optimistically remove an assessment from the list and delete it from
+   * localStorage. Fires DELETE /api/assessments/:id in the background
+   * (fire-and-forget, offline-resilient).
+   */
+  deleteAssessment: (id: string) => void;
 }
 
 function sortByUpdatedAt(list: Assessment[]): Assessment[] {
@@ -112,6 +119,24 @@ export function useAssessments(authToken?: string): UseAssessmentsReturn {
     reconcileCloud();
   }, [loadLocal, reconcileCloud]);
 
+  const deleteAssessment = useCallback(
+    (id: string) => {
+      // Optimistic update — remove from state immediately
+      setAssessments((prev) => prev.filter((a) => a.id !== id));
+      // Remove from localStorage
+      localDeleteAssessment(id);
+      // Fire-and-forget cloud delete
+      const headers: Record<string, string> = {};
+      if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
+      fetch(`/api/assessments/${id}`, { method: "DELETE", headers }).catch(
+        () => {
+          // Offline-resilient: ignore network errors
+        }
+      );
+    },
+    [authToken]
+  );
+
   // Initial load
   useEffect(() => {
     loadLocal();
@@ -119,5 +144,5 @@ export function useAssessments(authToken?: string): UseAssessmentsReturn {
     reconcileCloud();
   }, [loadLocal, reconcileCloud]);
 
-  return { assessments, loading, cloudError, syncing, refresh };
+  return { assessments, loading, cloudError, syncing, refresh, deleteAssessment };
 }
