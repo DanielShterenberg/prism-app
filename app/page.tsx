@@ -19,6 +19,7 @@ import { useAuth } from "@/components/AuthProvider";
 import AssessmentCard from "@/components/AssessmentCard";
 import NewAssessmentModal from "@/components/NewAssessmentModal";
 import OnboardingModal from "@/components/OnboardingModal";
+import PrismLogo from "@/components/PrismLogo";
 
 export default function HomePage() {
   const { token } = useAuth();
@@ -40,15 +41,7 @@ export default function HomePage() {
       <div style={{ backgroundColor: "#09090f" }}>
         <header className="sticky top-0 z-10" style={{ backgroundColor: "#09090f" }}>
           <div className="max-w-4xl mx-auto px-4 lg:px-8 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}
-              >
-                <span className="text-white font-bold text-xs">P</span>
-              </div>
-              <span className="text-white font-semibold text-[17px] tracking-tight">Prism</span>
-            </div>
+            <PrismLogo />
             {syncing && (
               <span role="status" aria-label="מסנכרן עם הענן"
                 className="text-xs animate-pulse"

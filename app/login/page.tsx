@@ -8,6 +8,7 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 import { getClientAuth } from "@/lib/firebase";
+import PrismLogo from "@/components/PrismLogo";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -70,14 +71,8 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-[360px]">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg"
-              style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)" }}
-            >
-              <span className="text-white font-bold text-base">P</span>
-            </div>
-            <span className="text-white font-semibold text-2xl tracking-tight">Prism</span>
+          <div className="inline-flex justify-center mb-4">
+            <PrismLogo size="lg" />
           </div>
           <p style={{ color: "rgba(255,255,255,0.35)" }} className="text-sm">
             מערכת הערכה קלינית

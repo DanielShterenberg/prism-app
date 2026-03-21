@@ -49,3 +49,11 @@ next-env.d.ts
 
 # Babysitter
 .a5c/
+
+# Stitch design assets (generated files, not source)
+.stitch/
+
+# Skills (installed locally, not committed)
+.agents/
+.claude/skills/
+skills-lock.json
