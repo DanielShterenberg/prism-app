@@ -277,11 +277,11 @@ select {
 
   /* Block heading */
   #summary-content h2 {
-    font-size: 9.5pt;
-    font-weight: 600;
-    color: #555555;
+    font-size: 9pt;
+    font-weight: 700;
+    color: #7c3aed;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     margin-bottom: 5pt;
   }
 
@@ -314,11 +314,12 @@ select {
     white-space: pre-wrap;
   }
 
-  /* Print-only header typography */
-  #summary-content ~ * h1,
-  .print\:block h1 {
-    font-size: 18pt;
-    font-weight: 700;
-    color: #111111;
+  /* Footer on last page */
+  @page:last {
+    @bottom-center {
+      content: "נוצר ע\"י Prism · prism-app-blue.vercel.app";
+      font-size: 8pt;
+      color: #aaaaaa;
+    }
   }
 }

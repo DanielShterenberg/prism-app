@@ -444,26 +444,6 @@ export default function SummaryPage() {
       </button>
 
       {/* ------------------------------------------------------------------ */}
-      {/* Export button — triggers browser print dialog                       */}
-      {/* ------------------------------------------------------------------ */}
-      <button
-        type="button"
-        onClick={() => window.print()}
-        aria-label="ייצוא ל-PDF"
-        className={[
-          "flex-shrink-0 rounded-xl border border-gray-300 bg-white text-gray-700",
-          "py-3 px-4",
-          "text-[17px] font-medium",
-          "min-h-[52px]",
-          "hover:bg-gray-50 active:scale-[0.99] transition-all duration-150",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2",
-          "print:hidden",
-        ].join(" ")}
-      >
-        ייצוא
-      </button>
-
-      {/* ------------------------------------------------------------------ */}
       {/* Mark as Completed button                                             */}
       {/* ------------------------------------------------------------------ */}
       <button
@@ -532,21 +512,28 @@ export default function SummaryPage() {
               {/* Completed badge */}
               {isCompleted && (
                 <span className="flex-shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1 text-[13px] font-medium" style={{ background: "rgba(52,211,153,0.15)", color: "#34d399" }}>
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 12 12"
-                    className="w-3 h-3"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
+                  <svg aria-hidden="true" viewBox="0 0 12 12" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="1.5,6 4.5,9 10.5,3" />
                   </svg>
                   הושלם
                 </span>
               )}
+
+              {/* Export PDF icon button */}
+              <button
+                type="button"
+                onClick={() => window.print()}
+                aria-label="ייצוא ל-PDF"
+                className="w-9 h-9 flex items-center justify-center rounded-full flex-shrink-0 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                style={{ color: "rgba(255,255,255,0.5)" }}
+              >
+                <svg viewBox="0 0 24 24" className="w-4.5 h-4.5 w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/>
+                  <polyline points="9 15 12 18 15 15"/>
+                </svg>
+              </button>
             </div>
           </div>
         </header>
@@ -616,36 +603,59 @@ export default function SummaryPage() {
                   {/* Completed badge */}
                   {isCompleted && (
                     <span className="flex-shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1 text-[13px] font-medium" style={{ background: "rgba(52,211,153,0.15)", color: "#34d399" }}>
-                      <svg
-                        aria-hidden="true"
-                        viewBox="0 0 12 12"
-                        className="w-3 h-3"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
+                      <svg aria-hidden="true" viewBox="0 0 12 12" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="1.5,6 4.5,9 10.5,3" />
                       </svg>
                       הושלם
                     </span>
                   )}
+
+                  {/* Export PDF icon button */}
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    aria-label="ייצוא ל-PDF"
+                    className="w-9 h-9 flex items-center justify-center rounded-full flex-shrink-0 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                    style={{ color: "rgba(255,255,255,0.5)" }}
+                  >
+                    <svg viewBox="0 0 24 24" className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                      <line x1="12" y1="18" x2="12" y2="12"/>
+                      <polyline points="9 15 12 18 15 15"/>
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Print-only header — shows patient name and assessment date at the top of the PDF */}
-            <div className="hidden print:block mb-6" aria-hidden="true">
-              <h1 className="text-[22px] font-bold text-gray-900 leading-snug">
-                {patientName}
-              </h1>
-              {assessmentDate && (
-                <p className="text-[15px] text-gray-500 mt-1">
-                  תאריך הערכה: {assessmentDate}
-                </p>
-              )}
-              <div className="mt-3 border-b border-gray-300" />
+            {/* Print-only header — branded PDF header with Prism logo */}
+            <div className="hidden print:block mb-8" aria-hidden="true">
+              {/* Violet brand bar */}
+              <div style={{ background: "linear-gradient(135deg, #7c3aed, #4f46e5)", padding: "14pt 18pt", marginBottom: "16pt", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                {/* Prism logo: triangle + wordmark */}
+                <div style={{ display: "flex", alignItems: "center", gap: "10pt" }}>
+                  <div style={{ width: "28pt", height: "28pt", clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)", background: "rgba(255,255,255,0.9)", flexShrink: 0 }} />
+                  <span style={{ color: "#ffffff", fontFamily: "Rubik, Arial Hebrew, sans-serif", fontWeight: 700, fontSize: "18pt", letterSpacing: "-0.02em" }}>Prism</span>
+                </div>
+                {/* Report label */}
+                <span style={{ color: "rgba(255,255,255,0.7)", fontFamily: "Rubik, Arial Hebrew, sans-serif", fontSize: "9pt", letterSpacing: "0.06em", textTransform: "uppercase" }}>דוח הערכה קלינית</span>
+              </div>
+              {/* Patient info */}
+              <div style={{ paddingInline: "4pt" }}>
+                <h1 style={{ fontSize: "20pt", fontWeight: 700, color: "#09090f", lineHeight: 1.2, marginBottom: "4pt" }}>
+                  {patientName}
+                </h1>
+                {assessmentDate && (
+                  <p style={{ fontSize: "11pt", color: "#6b7280", marginBottom: "2pt" }}>
+                    תאריך הערכה: {assessmentDate}
+                  </p>
+                )}
+                {isCompleted && (
+                  <p style={{ fontSize: "10pt", color: "#7c3aed", fontWeight: 600 }}>✓ הערכה הושלמה</p>
+                )}
+              </div>
+              <div style={{ borderBottom: "2px solid #7c3aed", marginTop: "12pt", opacity: 0.3 }} />
             </div>
 
             {/* Summary content */}
