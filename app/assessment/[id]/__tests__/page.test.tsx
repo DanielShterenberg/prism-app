@@ -16,6 +16,7 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import AssessmentPage from "../page";
 import * as useAssessmentHook from "@/hooks/useAssessment";
+import * as useSyncHook from "@/hooks/useSync";
 import type { Assessment } from "@/types/assessment";
 
 // ---------------------------------------------------------------------------
@@ -44,7 +45,7 @@ jest.mock("@/hooks/useAssessments", () => ({
 
 // useSync triggers network calls — stub it out.
 jest.mock("@/hooks/useSync", () => ({
-  useSync: jest.fn(),
+  useSync: jest.fn(() => ({ syncStatus: "synced", flushRetryQueue: jest.fn() })),
 }));
 
 // EditAssessmentModal — stub with a simple dialog so we can test open/close.
@@ -252,5 +253,41 @@ describe("AssessmentPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "סגור מודל" }));
     expect(screen.queryByRole("dialog", { name: "edit-modal-stub" })).not.toBeInTheDocument();
+  });
+
+  // -------------------------------------------------------------------------
+  // Sync indicator integration
+  // -------------------------------------------------------------------------
+
+  it("renders the sync indicator in the header when synced", () => {
+    mockFound(makeAssessment({ syncStatus: "synced" }));
+    render(<AssessmentPage />);
+    // Both mobile and desktop headers render the indicator
+    const indicators = screen.getAllByRole("status");
+    expect(indicators.length).toBeGreaterThanOrEqual(1);
+    expect(indicators[0]).toHaveTextContent("נשמר ✓");
+  });
+
+  it("renders the error sync indicator as a button when syncStatus is error", () => {
+    mockFound(makeAssessment({ syncStatus: "error" }));
+    render(<AssessmentPage />);
+    const errorBtns = screen.getAllByRole("button", { name: /שגיאת סנכרון/i });
+    expect(errorBtns.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("calls flushRetryQueue when retry is clicked on error indicator", () => {
+    const mockFlush = jest.fn();
+    (useSyncHook.useSync as jest.Mock).mockReturnValue({
+      syncStatus: "error",
+      flushRetryQueue: mockFlush,
+    });
+    mockFound(makeAssessment({ syncStatus: "error" }));
+    render(<AssessmentPage />);
+
+    // Open popover on first error button
+    fireEvent.click(screen.getAllByRole("button", { name: /שגיאת סנכרון/i })[0]);
+    // Click retry
+    fireEvent.click(screen.getByRole("button", { name: "נסה שוב" }));
+    expect(mockFlush).toHaveBeenCalledTimes(1);
   });
 });

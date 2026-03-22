@@ -31,6 +31,7 @@ import BlockE from "@/components/BlockE";
 import AssessmentSidebar from "@/components/AssessmentSidebar";
 import NewAssessmentModal from "@/components/NewAssessmentModal";
 import EditAssessmentModal from "@/components/EditAssessmentModal";
+import SyncIndicator from "@/components/SyncIndicator";
 import type { Assessment } from "@/types/assessment";
 import type { BlockId } from "@/components/BlockTabBar";
 
@@ -85,7 +86,7 @@ export default function AssessmentPage() {
   const [syncSnapshot, setSyncSnapshot] = useState<Assessment | null>(null);
 
   // Sync hook — debounced cloud sync, offline-first.
-  useSync({
+  const { flushRetryQueue } = useSync({
     assessment: syncSnapshot,
     authToken: token ?? undefined,
     onSyncStatusChange: () => {
@@ -196,6 +197,12 @@ export default function AssessmentPage() {
                 )}
               </div>
 
+              {/* Sync indicator — mobile header */}
+              <SyncIndicator
+                syncStatus={assessment.syncStatus}
+                onRetry={flushRetryQueue}
+              />
+
               {/* Edit button */}
               <button
                 type="button"
@@ -297,6 +304,12 @@ export default function AssessmentPage() {
                       </p>
                     )}
                   </div>
+
+                  {/* Sync indicator — desktop header */}
+                  <SyncIndicator
+                    syncStatus={assessment.syncStatus}
+                    onRetry={flushRetryQueue}
+                  />
 
                   {/* Edit button */}
                   <button
